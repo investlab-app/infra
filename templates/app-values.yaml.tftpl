@@ -1,0 +1,50 @@
+global:
+  imageRegistry: ${global.imageRegistry}
+  imagePullSecrets:
+%{ for secret in global.imagePullSecrets ~}
+    - name: ${secret}
+%{ endfor ~}
+
+env:
+  database:
+    host: ${env.database.host}
+    port: ${env.database.port}
+    name: ${env.database.name}
+    user: ${env.database.user}
+    password: ${env.database.password}
+    url: "postgres://${env.database.user}:${env.database.password}@${env.database.host}:${env.database.port}/${env.database.name}"
+  redis:
+    host: ${env.redis.host}
+    port: ${env.redis.port}
+    password: ${env.redis.password}
+  django:
+    logLevel: ${env.django.logLevel}
+    debug: ${env.django.debug}
+    secretKey: ${env.django.secretKey}
+    allowedHosts: "${env.django.allowedHosts}"
+  cors:
+    allowedOrigins: ${env.cors.allowedOrigins}
+    csrfTrustedOrigins: ${env.cors.csrfTrustedOrigins}
+  clerk:
+    secretKey: ${env.clerk.secretKey}
+    issuer: ${env.clerk.issuer}
+    jwksUrl: ${env.clerk.jwksUrl}
+    jwtKey: |
+%{ for line in split("\n", trimspace(env.clerk.jwtKey)) ~}
+      ${replace(line, "\r", "")}
+%{ endfor ~}
+  apis:
+    polygonSecretKey: ${env.apis.polygonSecretKey}
+    alpacaPublicKey: ${env.apis.alpacaPublicKey}
+    alpacaSecretKey: ${env.apis.alpacaSecretKey}
+  email:
+    adminEmail: ${env.email.adminEmail}
+    fromEmail: ${env.email.fromEmail}
+    backend: ${env.email.backend}
+    filePath: ${env.email.filePath}
+  vapid:
+    privateKey: ${env.vapid.privateKey}
+    publicKey: ${env.vapid.publicKey}
+
+ingress:
+  host: ${ingress.host}

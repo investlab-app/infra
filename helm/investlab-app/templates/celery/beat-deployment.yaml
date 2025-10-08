@@ -1,0 +1,35 @@
+{{- if .Values.celery.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-app.fullname" . }}-celery-beat
+  labels:
+    {{- include "investlab-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: celery-beat
+spec:
+  replicas: {{ .Values.celery.beat.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: celery-beat
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: celery-beat
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "investlab-app.serviceAccountName" . }}
+      containers:
+        - name: celery-beat
+          image: {{ include "investlab-app.backendImage" . }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          command: ["uv", "run", "celery", "-A", "config", "beat", "-l", "info"]
+          env:
+            {{- include "investlab-app.backendEnvVars" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.celery.beat.resources | nindent 12 }}
+{{- end }}

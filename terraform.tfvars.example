@@ -1,0 +1,66 @@
+# Kubernetes
+kubernetes_cluster_ca_certificate = 
+kubernetes_namespace              = 
+kubernetes_host                   = 
+kubernetes_token                  = 
+
+# Oracle
+oke_cluster_ocid = 
+
+# Docker Registry
+docker_server   = 
+docker_username = 
+docker_password = 
+docker_email    = 
+
+# PostgreSQL
+postgresql_storage_class = 
+postgres_user            = 
+postgres_db              = 
+postgres_password        = 
+postgres_port            = 
+
+# Redis
+redis_storage_class = 
+redis_host          = 
+redis_port          = 
+redis_password      = 
+
+# Cert manager
+cert_manager_email = 
+
+# Ingress
+ingress_host = 
+
+# Clerk (auth)
+clerk_secret_key = 
+clerk_issuer     = 
+clerk_jwks_url   = 
+clerk_jwt_key    = 
+
+# APIs
+polygon_secret_key = 
+alpaca_public_key  = 
+alpaca_secret_key  = 
+
+# Container images
+backend_image  = 
+frontend_image = 
+
+# Django
+django_log_level     = 
+debug                = 
+secret_key           = 
+allowed_hosts        = 
+cors_allowed_origins = 
+csrf_trusted_origins = 
+
+# Email
+admin_email     = 
+from_email      = 
+email_backend   = 
+email_file_path = 
+
+# Vapid
+vapid_private_key = 
+vapid_public_key  = 

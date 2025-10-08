@@ -1,0 +1,50 @@
+name: 'Setup Terraform'
+description: 'Reusable action for setting up Terraform with OCI providers'
+inputs:
+  terraform_version:
+    description: 'Terraform version to use'
+    required: false
+    default: '~> 1.10'
+  workspace:
+    description: 'Terraform workspace to select'
+    required: false
+    default: 'default'
+  cache_key_suffix:
+    description: 'Suffix for cache key'
+    required: false
+    default: ''
+  variables_file:
+    description: 'Base64 encoded variables file content'
+    required: false
+  secrets_file:
+    description: 'Base64 encoded secrets file content'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.terraform_version }}
+        terraform_wrapper: false
+
+    - name: Cache Terraform plugins
+      uses: actions/cache@v4
+      with:
+        path: .terraform
+        key: ${{ runner.os }}-terraform${{ inputs.cache_key_suffix }}-${{ hashFiles('**/*.tf') }}
+        restore-keys: ${{ runner.os }}-terraform-
+
+    - name: Create tfvars files
+      if: inputs.variables_file != '' || inputs.secrets_file != ''
+      shell: bash
+      run: |
+        [ -n "${{ inputs.variables_file }}" ] && echo "${{ inputs.variables_file }}" | base64 -d > terraform.tfvars
+        [ -n "${{ inputs.secrets_file }}" ] && echo "${{ inputs.secrets_file }}" | base64 -d > terraform.tfvars
+
+    - name: Initialize and select workspace
+      shell: bash
+      run: |
+        terraform init -input=false
+        terraform workspace select default

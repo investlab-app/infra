@@ -1,0 +1,35 @@
+{{- if .Values.priceStream.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-app.fullname" . }}-price-stream
+  labels:
+    {{- include "investlab-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: price-stream
+spec:
+  replicas: {{ .Values.priceStream.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: price-stream
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: price-stream
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "investlab-app.serviceAccountName" . }}
+      containers:
+        - name: price-stream
+          image: {{ include "investlab-app.backendImage" . }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          command: ["uv", "run", "manage.py", "mock_stream_prices"]
+          env:
+            {{- include "investlab-app.backendEnvVars" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.priceStream.resources | nindent 12 }}
+{{- end }}
