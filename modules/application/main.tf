@@ -82,8 +82,8 @@ resource "helm_release" "investlab_app" {
         }
 
         django = {
-          logLevel     = var.config.django.log_level
-          debug        = var.config.django.debug
+          logLevel = var.config.django.log_level
+          debug    = var.config.django.debug
           # Remove secretKey - it will be loaded from secrets
           allowedHosts = var.config.django.allowed_hosts
         }
