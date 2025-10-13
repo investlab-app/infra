@@ -1,0 +1,144 @@
+name: Terraform
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      backend_tag:
+        description: "Backend image tag"
+        required: false
+        default: "latest"
+      frontend_tag:
+        description: "Frontend image tag"
+        required: false
+        default: "latest"
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_VAR_kubernetes_host: ${{ secrets.KUBERNETES_HOST }}
+  TF_VAR_kubernetes_token: ${{ secrets.KUBERNETES_TOKEN }}
+  TF_VAR_kubernetes_cluster_ca_certificate: ${{ secrets.KUBERNETES_CLUSTER_CA_CERTIFICATE }}
+  TF_VAR_oke_cluster_ocid: ${{ secrets.OKE_CLUSTER_OCID }}
+
+jobs:
+  terraform-check:
+    name: Terraform Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: ./.github/actions/setup-terraform
+        with:
+          secrets_file: ${{ secrets.TF_SECRETS_TFVARS }}
+      - name: Check formatting and validate
+        run: |
+          terraform fmt -check -recursive
+          terraform validate -no-color
+      - name: Generate plan
+        id: plan
+        run: |
+          set +e
+          terraform plan -no-color -out=terraform.tfplan -detailed-exitcode -refresh=false
+          exit_code=$?
+          set -e
+
+          if [ "$exit_code" -eq 1 ]; then
+            echo "Terraform plan failed"
+            exit 1
+          fi
+
+          terraform show -no-color terraform.tfplan > plan.txt
+          echo "plan_exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+      - name: Upload plan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: terraform.tfplan
+          retention-days: 30
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('plan.txt', 'utf8');
+            const status = '${{ steps.plan.outcome }}' === 'success' ? '✅ Success' : '❌ Failed';
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Terraform Plan ${status}\n\n<details><summary>Plan details</summary>\n\n\`\`\`hcl\n${plan}\n\`\`\`\n</details>`
+            });
+      - name: Fail if plan failed
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: Staging
+      url: ${{ steps.outputs.outputs.app_url }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: ./.github/actions/setup-terraform
+        with:
+          secrets_file: ${{ secrets.TF_SECRETS_TFVARS }}
+      - name: Override image tags
+        if: github.event.inputs.backend_tag != '' || github.event.inputs.frontend_tag != ''
+        run: |
+          [ -n "${{ github.event.inputs.backend_tag }}" ] && \
+            echo 'backend_image = "ghcr.io/investlab-app/backend:${{ github.event.inputs.backend_tag }}"' >> terraform.tfvars
+          [ -n "${{ github.event.inputs.frontend_tag }}" ] && \
+            echo 'frontend_image = "ghcr.io/investlab-app/web:${{ github.event.inputs.frontend_tag }}"' >> terraform.tfvars
+      - name: Validate and plan
+        id: plan
+        run: |
+          terraform validate -no-color
+          terraform plan -no-color -out=terraform.tfplan -input=false
+          terraform show -no-color terraform.tfplan
+      - name: Apply changes
+        run: |
+          terraform apply -auto-approve -input=false -refresh=true
+      - name: Get outputs
+        id: outputs
+        run: |
+          terraform output -json > outputs.json
+          echo "app_url=$(terraform output -raw app_ingress_url)" >> $GITHUB_OUTPUT
+      - name: Update deployment status
+        if: github.event_name == 'deployment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: context.payload.deployment.id,
+              state: '${{ job.status }}',
+              environment_url: '${{ steps.outputs.outputs.app_url }}',
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+      - name: Upload state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: terraform.tfstate
+          name: terraform-state
+          retention-days: 30

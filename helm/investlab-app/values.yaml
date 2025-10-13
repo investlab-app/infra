@@ -1,0 +1,89 @@
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets: []
+
+env: {}
+
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    registry: ghcr.io
+    repository: investlab-app/web
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 80
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    registry: ghcr.io
+    repository: investlab-app/backend/test-mkapica
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+celery:
+  enabled: true
+  worker:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 300m
+        memory: 512Mi
+      requests:
+        cpu: 150m
+        memory: 128Mi
+  beat:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+
+priceStream:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/issue-temporary-certificate: "true"
+  host: 
+  tls:
+    enabled: true
+    secretName: frontend-tls
+
+serviceAccount:
+  create: true
