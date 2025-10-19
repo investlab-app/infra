@@ -28,7 +28,7 @@ backend:
   replicaCount: 2
   image:
     registry: ghcr.io
-    repository: investlab-app/backend/test-mkapica
+    repository: investlab-app/backend
     tag: latest
     pullPolicy: Always
   service:
