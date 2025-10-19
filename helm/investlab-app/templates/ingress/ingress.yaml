@@ -45,4 +45,18 @@ spec:
                 name: {{ $fullName }}-backend
                 port:
                   number: {{ .Values.backend.service.port }}
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-backend
+                port:
+                  number: {{ .Values.backend.service.port }}
+          - path: /media
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-backend
+                port:
+                  number: {{ .Values.backend.service.port }}
 {{- end }}

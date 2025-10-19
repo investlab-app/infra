@@ -18,6 +18,10 @@ on:
         required: false
         default: "latest"
 
+concurrency:
+  group: terraform-state
+  cancel-in-progress: false
+
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -25,6 +29,7 @@ env:
   TF_VAR_kubernetes_token: ${{ secrets.KUBERNETES_TOKEN }}
   TF_VAR_kubernetes_cluster_ca_certificate: ${{ secrets.KUBERNETES_CLUSTER_CA_CERTIFICATE }}
   TF_VAR_oke_cluster_ocid: ${{ secrets.OKE_CLUSTER_OCID }}
+  TF_LOCK_TIMEOUT: 30m
 
 jobs:
   terraform-check:
@@ -40,6 +45,13 @@ jobs:
         uses: ./.github/actions/setup-terraform
         with:
           secrets_file: ${{ secrets.TF_SECRETS_TFVARS }}
+      - name: Override image tags
+        if: github.event.inputs.backend_tag != '' || github.event.inputs.frontend_tag != ''
+        run: |
+          [ -n "${{ github.event.inputs.backend_tag }}" ] && \
+            echo 'backend_image = "ghcr.io/investlab-app/backend:${{ github.event.inputs.backend_tag }}"' >> terraform.tfvars
+          [ -n "${{ github.event.inputs.frontend_tag }}" ] && \
+            echo 'frontend_image = "ghcr.io/investlab-app/web:${{ github.event.inputs.frontend_tag }}"' >> terraform.tfvars
       - name: Check formatting and validate
         run: |
           terraform fmt -check -recursive
