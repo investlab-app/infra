@@ -17,6 +17,9 @@ spec:
       labels:
         {{- include "investlab-app.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: celery-worker
+      annotations:
+        # Force rollout when image digest changes
+        deployment.kubernetes.io/revision: "{{ .Release.Revision }}"
     spec:
       {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
