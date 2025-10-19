@@ -40,6 +40,13 @@ jobs:
         uses: ./.github/actions/setup-terraform
         with:
           secrets_file: ${{ secrets.TF_SECRETS_TFVARS }}
+      - name: Override image tags
+        if: github.event.inputs.backend_tag != '' || github.event.inputs.frontend_tag != ''
+        run: |
+          [ -n "${{ github.event.inputs.backend_tag }}" ] && \
+            echo 'backend_image = "ghcr.io/investlab-app/backend:${{ github.event.inputs.backend_tag }}"' >> terraform.tfvars
+          [ -n "${{ github.event.inputs.frontend_tag }}" ] && \
+            echo 'frontend_image = "ghcr.io/investlab-app/web:${{ github.event.inputs.frontend_tag }}"' >> terraform.tfvars
       - name: Check formatting and validate
         run: |
           terraform fmt -check -recursive
@@ -101,13 +108,6 @@ jobs:
         uses: ./.github/actions/setup-terraform
         with:
           secrets_file: ${{ secrets.TF_SECRETS_TFVARS }}
-      - name: Override image tags
-        if: github.event.inputs.backend_tag != '' || github.event.inputs.frontend_tag != ''
-        run: |
-          [ -n "${{ github.event.inputs.backend_tag }}" ] && \
-            echo 'backend_image = "ghcr.io/investlab-app/backend:${{ github.event.inputs.backend_tag }}"' >> terraform.tfvars
-          [ -n "${{ github.event.inputs.frontend_tag }}" ] && \
-            echo 'frontend_image = "ghcr.io/investlab-app/web:${{ github.event.inputs.frontend_tag }}"' >> terraform.tfvars
       - name: Validate and plan
         id: plan
         run: |
