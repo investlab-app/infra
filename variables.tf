@@ -165,11 +165,13 @@ variable "alpaca_secret_key" {
 variable "backend_image" {
   description = "Backend Docker image"
   type        = string
+  default     = "ghcr.io/investlab-app/backend:latest"
 }
 
 variable "frontend_image" {
   description = "Frontend Docker image"
   type        = string
+  default     = "ghcr.io/investlab-app/web:latest"
 }
 
 
