@@ -10,6 +10,7 @@ spec:
   source:
     repoURL: https://cloudnative-pg.github.io/charts
     chart: cloudnative-pg
+    targetRevision: 1.27.1
     helm:
       parameters:
         - name: crds.create
