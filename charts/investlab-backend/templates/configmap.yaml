@@ -36,29 +36,41 @@ spec:
     template:
       type: Opaque
       data:
+        SECRET_KEY: "{{ .secretKey }}"
         password: "{{ .databasePassword }}"
         CLERK_SECRET_KEY: "{{ .clerkSecretKey }}"
+        CLERK_ISSUER: "{{ .clerkIssuer }}"
+        CLERK_JWT_KEY: "{{ .clerkJwtKey }}"
         POLYGON_SECRET_KEY: "{{ .polygonSecretKey }}"
         ALPACA_SECRET_KEY: "{{ .alpacaSecretKey }}"
         MINIO_ACCESS_KEY: "{{ .minioAccessKey }}"
         MINIO_SECRET_KEY: "{{ .minioSecretKey }}"
   data:
-    - secretKey: password
+    - secretKey: secretKey
+      remoteRef:
+        key: django-secret-key
+    - secretKey: databasePassword
       remoteRef:
         key: {{ .Values.secrets.postgresPasswordKey }}
-    - secretKey: clerk-secret-key
+    - secretKey: clerkSecretKey
       remoteRef:
         key: {{ .Values.secrets.clerkSecretKey }}
-    - secretKey: polygon-secret-key
+    - secretKey: clerkIssuer
+      remoteRef:
+        key: clerk-issuer
+    - secretKey: clerkJwtKey
+      remoteRef:
+        key: clerk-jwt-key
+    - secretKey: polygonSecretKey
       remoteRef:
         key: {{ .Values.secrets.polygonSecretKey }}
-    - secretKey: alpaca-secret-key
+    - secretKey: alpacaSecretKey
       remoteRef:
         key: {{ .Values.secrets.alpacaSecretKey }}
-    - secretKey: minio-access-key
+    - secretKey: minioAccessKey
       remoteRef:
         key: {{ .Values.secrets.minioAccessKey }}
-    - secretKey: minio-secret-key
+    - secretKey: minioSecretKey
       remoteRef:
         key: {{ .Values.secrets.minioSecretKey }}
 {{- end }}
