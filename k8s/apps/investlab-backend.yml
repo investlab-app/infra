@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/investlab-app/infra.git
     targetRevision: main
-    path: k8s/charts/investlab-backend
+    path: charts/investlab-backend
     helm:
       valueFiles:
         - values.yaml
