@@ -1,6 +1,6 @@
 # Global configuration
 global:
-  imageRegistry: docker.io
+  imageRegistry: ghcr.io
   imagePullSecrets: []
 
 # Database configuration
@@ -33,7 +33,6 @@ api:
   enabled: true
   replicaCount: 3
   image:
-    registry: ghcr.io
     repository: investlab-app/backend
     tag: latest
     pullPolicy: Always
