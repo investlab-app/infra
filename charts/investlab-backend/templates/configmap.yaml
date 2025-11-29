@@ -48,6 +48,7 @@ spec:
       type: Opaque
       data:
         SECRET_KEY: "{{ .secretKey }}"
+        POSTGRES_PASSWORD: "{{ .databasePassword }}"
         password: "{{ .databasePassword }}"
         CLERK_SECRET_KEY: "{{ .clerkSecretKey }}"
         CLERK_ISSUER: "{{ .clerkIssuer }}"
