@@ -22,39 +22,6 @@ data:
   EMAIL_BACKEND: {{ .Values.api.config.emailBackend | default "django.core.mail.backends.console.EmailBackend" | quote }}
 
 ---
-# MCP Massive ConfigMap
-{{- if and .Values.mcp.enabled .Values.mcp.massive.enabled -}}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "investlab-mcp.massive.fullname" . }}-config
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "investlab-mcp.massive.labels" . | nindent 4 }}
-data:
-  # MCP Massive configuration
-  LOG_LEVEL: {{ .Values.mcp.massive.logLevel | default "INFO" | quote }}
-  PORT: {{ .Values.mcp.massive.port | default "8000" | quote }}
-{{- end }}
-
----
-# MCP ECharts ConfigMap
-{{- if and .Values.mcp.enabled .Values.mcp.echarts.enabled -}}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "investlab-mcp.echarts.fullname" . }}-config
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
-data:
-  # MCP ECharts configuration
-  LOG_LEVEL: {{ .Values.mcp.echarts.logLevel | default "INFO" | quote }}
-  PORT: {{ .Values.mcp.echarts.port | default "8000" | quote }}
-  NODE_ENV: {{ .Values.mcp.echarts.nodeEnv | default "production" | quote }}
-{{- end }}
-
----
 # External Secrets Secret
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
@@ -251,4 +218,42 @@ spec:
   - port: http
     targetPort: 8000
     path: /metrics
+{{- end }}
+
+{{- if .Values.mcp.enabled }}
+{{- if .Values.mcp.massive.enabled }}
+# MCP Massive ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "investlab-mcp.massive.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.massive.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.mcp.massive.logLevel | default "INFO" | quote }}
+  PORT: {{ .Values.mcp.massive.port | default "8000" | quote }}
+{{- end }}
+
+---
+{{- if .Values.mcp.echarts.enabled }}
+# MCP ECharts ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "investlab-mcp.echarts.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.mcp.echarts.logLevel | default "INFO" | quote }}
+  PORT: {{ .Values.mcp.echarts.port | default "8000" | quote }}
+  NODE_ENV: {{ .Values.mcp.echarts.nodeEnv | default "production" | quote }}
+  {{- if .Values.mcp.echarts.minio }}
+  MINIO_ENDPOINT: {{ .Values.mcp.echarts.minio.endpoint | quote }}
+  MINIO_PORT: {{ .Values.mcp.echarts.minio.port | default 9000 | quote }}
+  MINIO_USE_SSL: {{ .Values.mcp.echarts.minio.useSsl | default true | quote }}
+  MINIO_BUCKET_NAME: {{ .Values.mcp.echarts.minio.bucketName | default "echarts" | quote }}
+  {{- end }}
+{{- end }}
 {{- end }}
