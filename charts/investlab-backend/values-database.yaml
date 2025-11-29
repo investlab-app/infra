@@ -4,4 +4,4 @@ postgresql:
   auth:
     enablePostgresPassword: true
     existingSecret: investlab-backend-investlab-backend-secrets
-    existingSecretPasswordKey: DATABASE_PASSWORD
+    existingSecretPasswordKey: password
