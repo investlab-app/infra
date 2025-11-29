@@ -11,6 +11,7 @@ data:
   DJANGO_LOG_LEVEL: {{ .Values.api.config.djangoLogLevel | quote }}
   ALLOWED_HOSTS: {{ .Values.api.config.allowedHosts | quote }}
   CORS_ALLOWED_ORIGINS: {{ .Values.api.config.corsAllowedOrigins | quote }}
+  CSRF_TRUSTED_ORIGINS: {{ .Values.api.config.csrfTrustedOrigins | default .Values.api.config.corsAllowedOrigins | quote }}
   POSTGRES_DB: {{ .Values.api.config.postgresDb | default "investlab" | quote }}
   POSTGRES_HOST: {{ .Values.api.config.postgresHost | default "postgres-cluster-rw.postgres.svc.cluster.local" | quote }}
   POSTGRES_PORT: {{ .Values.api.config.postgresPort | default "5432" | quote }}

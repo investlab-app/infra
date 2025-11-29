@@ -53,6 +53,9 @@ api:
     djangoLogLevel: INFO
     allowedHosts: "*"
     corsAllowedOrigins: https://api.investlab.kapica.click
+    # CSRF trusted origins (defaults to corsAllowedOrigins if not set)
+    # For admin panel access, include both api and main domains
+    csrfTrustedOrigins: "https://api.investlab.kapica.click,https://investlab.kapica.click"
     # MCP Service URLs (optional - defaults to internal k8s services)
     # mcpMassiveUrl: "http://custom-mcp-massive:8000/mcp"
     # mcpEchartsUrl: "http://custom-mcp-echarts:8000/mcp"
