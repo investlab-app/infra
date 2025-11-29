@@ -250,10 +250,10 @@ mcp:
         memory: 512Mi
         cpu: 400m
     minio:
-      endpoint: "minio.example.com"
-      port: 9000
+      endpoint: "s3.us-east-1.amazonaws.com"
+      port: 443
       useSsl: true
-      bucketName: "echarts"
+      bucketName: "investlab-echarts-mcp"
 
 # Service configuration
 service:
