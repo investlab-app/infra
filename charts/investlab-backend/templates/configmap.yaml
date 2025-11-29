@@ -24,7 +24,7 @@ data:
 
 ---
 # External Secrets Secret
-apiVersion: external-secrets.io/v1
+apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: {{ include "investlab-backend-secrets.fullname" . }}
@@ -39,72 +39,53 @@ spec:
   target:
     name: {{ include "investlab-backend-secrets.fullname" . }}
     creationPolicy: Owner
-    template:
-      type: Opaque
-      data:
-        SECRET_KEY: "{{ .secretKey }}"
-        POSTGRES_PASSWORD: "{{ .databasePassword }}"
-        CLERK_SECRET_KEY: "{{ .clerkSecretKey }}"
-        CLERK_ISSUER: "{{ .clerkIssuer }}"
-        CLERK_JWT_KEY: "{{ .clerkJwtKey }}"
-        POLYGON_SECRET_KEY: "{{ .polygonSecretKey }}"
-        ALPACA_PUBLIC_KEY: "{{ .alpacaPublicKey }}"
-        ALPACA_SECRET_KEY: "{{ .alpacaSecretKey }}"
-        MINIO_ACCESS_KEY: "{{ .minioAccessKey }}"
-        MINIO_SECRET_KEY: "{{ .minioSecretKey }}"
-        OPENAI_API_KEY: "{{ .openaiApiKey }}"
-        GEMINI_API_KEY: "{{ .geminiApiKey }}"
-        VAPID_PRIVATE_KEY: "{{ .vapidPrivateKey }}"
-        VAPID_PUBLIC_KEY: "{{ .vapidPublicKey }}"
-        ADMIN_EMAIL: "{{ .adminEmail }}"
-        FROM_EMAIL: "{{ .fromEmail }}"
   data:
-    - secretKey: secretKey
+    - secretKey: SECRET_KEY
       remoteRef:
         key: django-secret-key
-    - secretKey: databasePassword
+    - secretKey: POSTGRES_PASSWORD
       remoteRef:
         key: postgres-password
-    - secretKey: clerkSecretKey
+    - secretKey: CLERK_SECRET_KEY
       remoteRef:
         key: clerk-secret-key
-    - secretKey: clerkIssuer
+    - secretKey: CLERK_ISSUER
       remoteRef:
         key: clerk-issuer
-    - secretKey: clerkJwtKey
+    - secretKey: CLERK_JWT_KEY
       remoteRef:
         key: clerk-jwt-key
-    - secretKey: polygonSecretKey
+    - secretKey: POLYGON_SECRET_KEY
       remoteRef:
         key: polygon-secret-key
-    - secretKey: alpacaPublicKey
+    - secretKey: ALPACA_PUBLIC_KEY
       remoteRef:
         key: alpaca-public-key
-    - secretKey: alpacaSecretKey
+    - secretKey: ALPACA_SECRET_KEY
       remoteRef:
         key: alpaca-secret-key
-    - secretKey: minioAccessKey
+    - secretKey: MINIO_ACCESS_KEY
       remoteRef:
         key: minio-access-key
-    - secretKey: minioSecretKey
+    - secretKey: MINIO_SECRET_KEY
       remoteRef:
         key: minio-secret-key
-    - secretKey: openaiApiKey
+    - secretKey: OPENAI_API_KEY
       remoteRef:
         key: openai-api-key
-    - secretKey: geminiApiKey
+    - secretKey: GEMINI_API_KEY
       remoteRef:
         key: gemini-api-key
-    - secretKey: vapidPrivateKey
+    - secretKey: VAPID_PRIVATE_KEY
       remoteRef:
         key: vapid-private-key
-    - secretKey: vapidPublicKey
+    - secretKey: VAPID_PUBLIC_KEY
       remoteRef:
         key: vapid-public-key
-    - secretKey: adminEmail
+    - secretKey: ADMIN_EMAIL
       remoteRef:
         key: admin-email
-    - secretKey: fromEmail
+    - secretKey: FROM_EMAIL
       remoteRef:
         key: from-email
 
