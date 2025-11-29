@@ -23,11 +23,16 @@ spec:
         imagePullPolicy: Always
         command:
           {{- toYaml .Values.mcp.massive.command | nindent 10 }}
+        env:
+          # Map POLYGON_SECRET_KEY from secrets to MASSIVE_API_KEY
+          - name: MASSIVE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "investlab-backend-secrets.fullname" . }}
+                key: POLYGON_SECRET_KEY
         envFrom:
         - configMapRef:
             name: {{ include "investlab-mcp.massive.fullname" . }}-config
-        - secretRef:
-            name: {{ include "investlab-backend-secrets.fullname" . }}
         ports:
         - containerPort: 8000
           name: http

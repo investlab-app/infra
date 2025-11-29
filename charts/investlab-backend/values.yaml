@@ -176,24 +176,22 @@ mcp:
       repository: astral-sh/uv
       tag: debian
     command:
-      [
-        "uvx",
-        "--from",
-        "git+https://github.com/investlab-app/mcp_massive",
-        "mcp_massive",
-      ]
-    ports:
-      - port: 8050
-    # Configuration values
+      - uvx
+      - --from
+      - git+https://github.com/investlab-app/mcp_massive
+      - mcp_massive
+    # Environment configuration
     logLevel: INFO
     port: "8000"
+    transport: streamable-http    # Added
+    host: "0.0.0.0"               # Added
     resources:
       requests:
-        memory: 256Mi
+        memory: 512Mi
         cpu: 200m
       limits:
-        memory: 512Mi
-        cpu: 400m
+        memory: 1Gi
+        cpu: 500m
 
   echarts:
     enabled: true
