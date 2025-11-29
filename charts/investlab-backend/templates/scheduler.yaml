@@ -45,7 +45,7 @@ spec:
         image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         workingDir: {{ .Values.scheduler.workingDir | default "/app" }}
-        command: {{ .Values.scheduler.command }}
+        command: {{ toYaml .Values.scheduler.command | nindent 8 }}
         env:
         - name: DATABASE_URL
           value: {{ .Values.api.config.databaseUrl }}
