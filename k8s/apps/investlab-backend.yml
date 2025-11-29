@@ -22,7 +22,6 @@ spec:
         - monitoring.yaml
         - networkPolicy.yaml
       releaseName: investlab-backend
-      version: 0.1.0
   destination:
     server: https://kubernetes.default.svc
     namespace: backend
