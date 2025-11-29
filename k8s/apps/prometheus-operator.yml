@@ -10,8 +10,13 @@ spec:
   project: default
   source:
     repoURL: https://github.com/prometheus-operator/prometheus-operator
-    targetRevision: release-0.68  # Latest stable release
-    path: bundle  # Contains all CRDs and manifests
+    targetRevision: release-0.68 # Latest stable release
+    path: example/prometheus-operator-latest
+    helm:
+      releaseName: prometheus-operator
+      values: |
+        prometheusOperator:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
@@ -20,8 +25,8 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
+      - CreateNamespace=true
+      - ServerSideApply=true
     retry:
       limit: 5
       backoff:
