@@ -184,6 +184,9 @@ mcp:
       ]
     ports:
       - port: 8050
+    # Configuration values
+    logLevel: INFO
+    port: "8000"
     resources:
       requests:
         memory: 256Mi
@@ -202,6 +205,10 @@ mcp:
     command: ["/bin/sh", "-c", "npx -y mcp-echarts -t streamable --port 8000"]
     ports:
       - port: 8051
+    # Configuration values
+    logLevel: INFO
+    port: "8000"
+    nodeEnv: production
     resources:
       requests:
         memory: 256Mi
