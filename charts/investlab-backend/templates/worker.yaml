@@ -62,6 +62,30 @@ spec:
             secretKeyRef:
               name: {{ .Values.postgresql.auth.existingSecret }}
               key: password
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: SECRET_KEY
+        - name: CLERK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: CLERK_SECRET_KEY
+        - name: CLERK_ISSUER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: CLERK_ISSUER
+        - name: CLERK_JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: CLERK_JWT_KEY
+        - name: ALLOWED_HOSTS
+          value: {{ .Values.api.config.allowedHosts }}
+        - name: CORS_ALLOWED_ORIGINS
+          value: {{ .Values.api.config.corsAllowedOrigins }}
         - name: CLERK_SECRET_KEY
           valueFrom:
             secretKeyRef:
