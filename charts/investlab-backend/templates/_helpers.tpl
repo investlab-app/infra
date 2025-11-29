@@ -138,3 +138,19 @@ app.kubernetes.io/name: investlab-mcp
 app.kubernetes.io/component: echarts
 app.kubernetes.io/part-of: investlab
 {{- end }}
+
+{{- define "postgres-cluster.fullname" -}}
+postgres-cluster
+{{- end }}
+
+{{- define "postgres-cluster.namespace" -}}
+postgres
+{{- end }}
+
+{{- define "redis-cluster.fullname" -}}
+redis-cluster
+{{- end }}
+
+{{- define "redis-cluster.namespace" -}}
+redis
+{{- end }}

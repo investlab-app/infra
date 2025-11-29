@@ -36,7 +36,7 @@ spec:
       {{- if .Values.redis.enabled }}
       - name: wait-for-redis
         image: redis:8.2-alpine
-        command: ['sh', '-c', 'until redis-cli -h {{ include "redis-cluster.fullname" . }}-master.{{ include "redis-cluster.namepsace" . }}.svc.cluster.local -p 6379 ping; do echo "Waiting for redis..."; sleep 5; done']
+        command: ['sh', '-c', 'until redis-cli -h {{ include "redis-cluster.fullname" . }}-master.{{ include "redis-cluster.namespace" . }}.svc.cluster.local -p 6379 ping; do echo "Waiting for redis..."; sleep 5; done']
         resources:
           requests:
             memory: "64Mi"
