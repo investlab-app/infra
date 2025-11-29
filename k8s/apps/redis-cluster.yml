@@ -82,6 +82,11 @@ spec:
         # Metrics and monitoring
         metrics:
           enabled: true
+          image:
+            registry: docker.io
+            repository: bitnami/redis-exporter
+            tag: 1-debian-12  # <--- Uses the latest stable 1.x version
+            pullPolicy: Always
           serviceMonitor:
             enabled: true
             namespace: monitoring
