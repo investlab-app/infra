@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: echarts
-        image: {{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "18-alpine" }}
+        image: {{ .Values.mcp.echarts.image.registry }}/{{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "22-alpine" }}
         imagePullPolicy: Always
         command: {{ .Values.mcp.echarts.command }}
         envFrom:
