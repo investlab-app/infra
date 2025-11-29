@@ -24,7 +24,7 @@ redis:
       size: 32Gi
       storageClass: oci-bv
     replica:
-      replicaCount: 3
+      replicaCount: 2
       persistence:
         enabled: true
         size: 32Gi
