@@ -1,0 +1,127 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-cluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: redis-cluster
+    app.kubernetes.io/component: cache
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 20.3.0  # Latest Redis chart as of 2025
+    chart: redis
+    helm:
+      releaseName: redis-cluster
+      values: |
+        # Global Redis configuration
+        global:
+          redis:
+            password: ""  # Will be set from secret
+        
+        # Authentication
+        auth:
+          enabled: true
+          existingSecret: redis-auth
+          existingSecretPasswordKey: redis-password
+        
+        # Architecture - High availability with replication
+        master:
+          persistence:
+            enabled: true
+            size: 32Gi
+            storageClass: oci-bv
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                      - redis
+                  topologyKey: kubernetes.io/hostname
+        
+        # Replica configuration for read scaling
+        replica:
+          replicaCount: 3
+          persistence:
+            enabled: true
+            size: 32Gi
+            storageClass: oci-bv
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                      - redis
+                  topologyKey: kubernetes.io/hostname
+        
+        # Metrics and monitoring
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            namespace: monitoring
+            labels:
+              release: prometheus
+        
+        # Network policies
+        networkPolicy:
+          enabled: true
+          ingress:
+            enabled: true
+            namespaceSelector:
+              matchLabels:
+                name: backend
+            namespaceSelector:
+              matchLabels:
+                name: web
+        
+        # Service configuration
+        service:
+          type: ClusterIP
+          port: 6379
+        
+        # Update strategy
+        updateStrategy:
+          type: RollingUpdate
+          
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
