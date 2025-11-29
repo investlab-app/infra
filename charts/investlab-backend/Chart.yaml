@@ -1,6 +1,6 @@
 apiVersion: v2
 name: investlab-backend
-description: InvestLab Backend - Paper trading application with Django, PostgreSQL, Redis, and MCP services
+description: InvestLab Backend
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
@@ -9,23 +9,5 @@ sources:
   - https://github.com/investlab-app/backend
 maintainers:
   - name: InvestLab Team
-    email: team@investlab.app
-keywords:
-  - django
-  - trading
-  - investment
-  - paper-trading
-  - api
-  - redis
-  - postgresql
-annotations:
-  category: Database
-  licenses: MIT
-dependencies:
-  - name: postgresql
-    version: "17.x.x"
-    condition: postgresql.enabled
-  - name: redis
-    version: "8.x.x"
-    condition: redis.enabled
+    email: app.investlab@gmail.com
 kubeVersion: ">=1.25.0-0"
