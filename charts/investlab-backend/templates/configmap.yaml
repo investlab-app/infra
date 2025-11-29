@@ -211,7 +211,7 @@ spec:
   namespaceSelector:
     matchLabels:
       name: {{ .Values.monitoring.serviceMonitor.namespace }}
-  ports:
+  endpoints:
   - port: http
     targetPort: 8000
     path: /metrics
