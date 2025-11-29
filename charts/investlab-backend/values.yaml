@@ -196,7 +196,7 @@ mcp:
     enabled: true
     replicaCount: 1
     image:
-      registry: docker.io
+      registry: mirror.gcr.io/library
       repository: node
       tag: 22-alpine
     command: ["/bin/sh", "-c", "npx -y mcp-echarts -t streamable --port 8000"]
