@@ -269,6 +269,12 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-origin: https://api.investlab.kapica.click
     nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
     nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($host = "investlab.kapica.click") {
+        if ($request_uri ~* "^/api") {
+          return 301 https://api.investlab.kapica.click$request_uri;
+        }
+      }
   tls:
     - hosts:
         - api.investlab.kapica.click
