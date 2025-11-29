@@ -215,8 +215,8 @@ mcp:
     # Environment configuration
     logLevel: INFO
     port: "8000"
-    transport: streamable-http    # Added
-    host: "0.0.0.0"               # Added
+    transport: streamable-http # Added
+    host: "0.0.0.0" # Added
     resources:
       requests:
         memory: 512Mi
@@ -307,6 +307,9 @@ ingress:
           service: api
           port: 8000
         - path: /media
+          service: api
+          port: 8000
+        - path: /ws
           service: api
           port: 8000
         - path: /
