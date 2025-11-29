@@ -44,6 +44,7 @@ spec:
       - name: worker
         image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        workingDir: {{ .Values.worker.workingDir | default "/app" }}
         command: {{ .Values.worker.command }}
         env:
         - name: DATABASE_URL

@@ -10,7 +10,7 @@ postgresql:
   auth:
     enablePostgresPassword: true
     existingSecret: investlab-backend-investlab-backend-secrets
-    existingSecretPasswordKey: DATABASE_PASSWORD
+    existingSecretPasswordKey: password
 
 # Redis configuration
 redis:
@@ -93,6 +93,7 @@ worker:
   enabled: true
   replicaCount: 1
   command: ["uv", "run", "celery", "-A", "config", "worker", "-l", "info"]
+  workingDir: /app
 
   resources:
     requests:
@@ -107,6 +108,7 @@ scheduler:
   enabled: true
   replicaCount: 1
   command: ["uv", "run", "celery", "-A", "config", "beat", "-l", "info"]
+  workingDir: /app
 
   resources:
     requests:
@@ -121,6 +123,7 @@ priceStream:
   enabled: true
   replicaCount: 1
   command: ["uv", "run", "manage.py", "mock_stream_prices"]
+  workingDir: /app
 
   resources:
     requests:
@@ -135,6 +138,7 @@ priceNotifier:
   enabled: true
   replicaCount: 1
   command: ["uv", "run", "manage.py", "notify_prices"]
+  workingDir: /app
 
   resources:
     requests:
@@ -149,6 +153,7 @@ orderEngine:
   enabled: true
   replicaCount: 1
   command: ["uv", "run", "manage.py", "run_order_engine"]
+  workingDir: /app
 
   resources:
     requests:
