@@ -1,0 +1,66 @@
+{{- if and .Values.mcp.enabled .Values.mcp.massive.enabled -}}
+# MCP Massive Service - Data visualization and analysis
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-mcp.massive.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.massive.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mcp.massive.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-mcp.massive.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-mcp.massive.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: massive
+        image: {{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
+        imagePullPolicy: Always
+        command: {{ .Values.mcp.massive.command }}
+        env:
+        - name: POLYGON_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: POLYGON_SECRET_KEY
+        - name: MCP_TRANSPORT
+          value: {{ .Values.mcp.massive.transport }}
+        - name: MASSIVE_MCP_HOST
+          value: {{ .Values.mcp.massive.host }}
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.mcp.massive.resources }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "investlab-mcp.massive.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}

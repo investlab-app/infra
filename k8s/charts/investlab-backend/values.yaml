@@ -1,0 +1,299 @@
+# Global configuration
+global:
+  imageRegistry: docker.io
+  imagePullSecrets: []
+
+# Database configuration
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresPassword: true
+    existingSecret: postgres-superuser
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    existingSecret: redis-auth
+  master:
+    persistence:
+      enabled: true
+      size: 32Gi
+      storageClass: oci-bv
+    replica:
+      replicaCount: 3
+      persistence:
+        enabled: true
+        size: 32Gi
+        storageClass: oci-bv
+
+# Main Django API configuration
+api:
+  enabled: true
+  replicaCount: 3
+  image:
+    registry: ghcr.io
+    repository: investlab-app/backend
+    tag: latest
+    pullPolicy: Always
+
+  # Resource configuration
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+  # Application configuration
+  config:
+    databaseUrl: "postgres://postgres:password@postgres-cluster-rw.postgres.svc.cluster.local:5432/investlab"
+    redisUrl: "redis://:password@redis-cluster-master.redis.svc.cluster.local:6379/0"
+    djangoSettingsModule: config.settings.prod
+    djangoLogLevel: INFO
+    allowedHosts: api.investlab.app,backend,localhost
+    corsAllowedOrigins: https://api.investlab.kapica.click
+    environment: production
+
+  # Persistent storage
+  persistence:
+    static:
+      enabled: true
+      size: 5Gi
+      storageClass: oci-bv
+    media:
+      enabled: true
+      size: 10Gi
+      storageClass: oci-bv
+
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /api/status
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /api/status
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Celery Worker configuration
+worker:
+  enabled: true
+  replicaCount: 2
+  command: ["uv", "run", "celery", "-A", "config", "worker", "-l", "info"]
+
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+# Celery Beat Scheduler configuration
+scheduler:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "celery", "-A", "config", "beat", "-l", "info"]
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+
+# Price Stream Service configuration
+priceStream:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "mock_stream_prices"]
+
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+# Price Notifier Service configuration
+priceNotifier:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "notify_prices"]
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+    limits:
+      memory: 512Mi
+      cpu: 400m
+
+# Order Engine Service configuration
+orderEngine:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "run_order_engine"]
+
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+# MCP Services configuration
+mcp:
+  enabled: true
+
+  massive:
+    enabled: true
+    replicaCount: 1
+    image:
+      registry: ghcr.io
+      repository: astral-sh/uv
+      tag: debian
+    command:
+      [
+        "uvx",
+        "--from",
+        "git+https://github.com/investlab-app/mcp_massive",
+        "mcp_massive",
+      ]
+    ports:
+      - port: 8050
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 200m
+      limits:
+        memory: 512Mi
+        cpu: 400m
+
+  echarts:
+    enabled: true
+    replicaCount: 1
+    image:
+      registry: docker.io
+      repository: node
+      tag: 18-alpine
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "printenv && npx -y mcp-echarts -t streamable --port 8000",
+      ]
+    ports:
+      - port: 8051
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 200m
+      limits:
+        memory: 512Mi
+        cpu: 400m
+
+# Service configuration
+service:
+  type: ClusterIP
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 300
+    nginx.ingress.kubernetes.io/proxy-send-timeout: 300
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://api.investlab.app
+    nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+    nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization
+  tls:
+    - hosts:
+        - api.investlab.app
+      secretName: investlab-backend-tls
+  hosts:
+    - host: api.investlab.app
+      paths:
+        - path: /api
+          service: api
+          port: 8000
+        - path: /admin
+          service: api
+          port: 8000
+        - path: /static
+          service: api
+          port: 8000
+        - path: /media
+          service: api
+          port: 8000
+        - path: /mcp/massive
+          service: mcp-massive
+          port: 8050
+        - path: /mcp/echarts
+          service: mcp-echarts
+          port: 8051
+
+# Auto-scaling configuration
+autoscaling:
+  enabled: true
+  api:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilization: 70
+    targetMemoryUtilization: 80
+  worker:
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilization: 70
+    targetMemoryUtilization: 80
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      release: prometheus
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: web
+        - namespaceSelector:
+            matchLabels:
+              name: backend
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: postgres
+        - namespaceSelector:
+            matchLabels:
+              name: redis

@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: investlab-backend
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: investlab-backend
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: investlab
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/investlab-app/infra.git
+    targetRevision: main
+    path: k8s/charts/investlab-backend
+    helm:
+      valueFiles:
+        - values.yaml
+        - secrets.yaml
+        - database.yaml
+        - redis.yaml
+        - monitoring.yaml
+        - networkPolicy.yaml
+      releaseName: investlab-backend
+      version: 0.1.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

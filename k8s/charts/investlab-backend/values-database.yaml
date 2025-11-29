@@ -1,0 +1,6 @@
+# PostgreSQL configuration (via CloudNativePG dependency)
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresPassword: true
+    existingSecret: postgres-superuser

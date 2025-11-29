@@ -1,0 +1,64 @@
+{{- if .Values.api.enabled -}}
+# Main API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "investlab-backend.api.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+    {{- with .Values.service.annotations }}{{- toYaml .Values.service.annotations | nindent 4 }}{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "investlab-backend.api.selectorLabels" . | nindent 6 }}
+{{- end }}
+
+---
+{{- if .Values.mcp.enabled }}
+# MCP Massive Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "investlab-mcp.massive.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.massive.labels" . | nindent 4 }}
+    {{- with .Values.service.annotations }}{{- toYaml .Values.service.annotations | nindent 4 }}{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: 8050
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "investlab-mcp.massive.selectorLabels" . | nindent 6 }}
+{{- end }}
+
+---
+{{- if and .Values.mcp.enabled .Values.mcp.echarts.enabled -}}
+# MCP ECharts Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "investlab-mcp.echarts.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
+    {{- with .Values.service.annotations }}{{- toYaml .Values.service.annotations | nindent 4 }}{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: 8051
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "investlab-mcp.echarts.selectorLabels" . | nindent 6 }}
+{{- end }}

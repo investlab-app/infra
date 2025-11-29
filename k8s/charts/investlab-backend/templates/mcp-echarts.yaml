@@ -1,0 +1,75 @@
+{{- if and .Values.mcp.enabled .Values.mcp.echarts.enabled -}}
+# MCP ECharts Service - Chart generation and visualization
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-mcp.echarts.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mcp.echarts.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-mcp.echarts.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-mcp.echarts.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: echarts
+        image: {{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "18-alpine" }}
+        imagePullPolicy: Always
+        command: {{ .Values.mcp.echarts.command }}
+        env:
+        - name: MINIO_ENDPOINT
+          value: {{ .Values.mcp.echarts.minio.endpoint }}
+        - name: MINIO_PORT
+          value: {{ .Values.mcp.echarts.minio.port | quote }}
+        - name: MINIO_USE_SSL
+          value: {{ .Values.mcp.echarts.minio.useSsl | quote }}
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: MINIO_ACCESS_KEY
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "investlab-backend-secrets.fullname" . }}
+              key: MINIO_SECRET_KEY
+        - name: MINIO_BUCKET_NAME
+          value: {{ .Values.mcp.echarts.minio.bucketName }}
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.mcp.echarts.resources }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "investlab-mcp.echarts.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}

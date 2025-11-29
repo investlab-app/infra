@@ -1,0 +1,10 @@
+# Monitoring configuration
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      release: prometheus
+  networkPolicy:
+    enabled: true
