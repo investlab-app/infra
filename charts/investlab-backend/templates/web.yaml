@@ -42,6 +42,9 @@ spec:
           periodSeconds: {{ .Values.web.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.web.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ .Values.web.readinessProbe.failureThreshold }}
+        envFrom:
+          - secretRef:
+              name: {{ include "investlab-backend.web.fullname" . }}-secrets
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

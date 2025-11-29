@@ -93,6 +93,35 @@ spec:
     - secretKey: REDIS_PASSWORD
       remoteRef:
         key: redis-password
+        
+---
+        
+# Web Secrets
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: {{ include "investlab-backend.web.fullname" . }}-secrets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.web.labels" . | nindent 4 }}
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: oci-vault
+    kind: ClusterSecretStore
+  target:
+    name: {{ include "investlab-backend.web.fullname" . }}-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: VITE_PUBLIC_POSTHOG_KEY
+      remoteRef:
+        key: vite-public-posthog-key
+    - secretKey: VITE_PUBLIC_POSTHOG_HOST
+      remoteRef:
+        key: vite-public-posthog-host
+    - secretKey: VITE_CLERK_PUBLISHABLE_KEY
+      remoteRef:
+        key: clerk-publishable-key
 
 ---
 # Static files PVC
