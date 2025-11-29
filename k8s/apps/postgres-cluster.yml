@@ -4,7 +4,7 @@ metadata:
   name: postgres-cluster
   namespace: postgres
 spec:
-  instances: 3
+  instances: 2
 
   # PostgreSQL 17 to match local development
   imageName: ghcr.io/cloudnative-pg/postgresql:17
