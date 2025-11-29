@@ -14,6 +14,7 @@ data:
   POSTGRES_DB: {{ .Values.api.config.postgresDb | default "investlab" | quote }}
   POSTGRES_HOST: {{ .Values.api.config.postgresHost | default "postgres-cluster-rw.postgres.svc.cluster.local" | quote }}
   POSTGRES_PORT: {{ .Values.api.config.postgresPort | default "5432" | quote }}
+  POSTGRES_USER: {{ .Values.api.config.postgresUser | default "postgres" | quote }}
   REDIS_HOST: {{ .Values.api.config.redisHost | default "redis-cluster-master.redis.svc.cluster.local" | quote }}
   REDIS_PORT: {{ .Values.api.config.redisPort | default "6379" | quote }}
   OPENAI_API_URL: {{ .Values.api.config.openaiApiUrl | default "https://api.groq.com/openai/v1" | quote }}
