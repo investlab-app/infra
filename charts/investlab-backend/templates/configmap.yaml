@@ -236,7 +236,6 @@ data:
   MCP_TRANSPORT: {{ .Values.mcp.massive.transport | default "streamable-http" | quote }}
   MASSIVE_MCP_HOST: {{ .Values.mcp.massive.host | default "0.0.0.0" | quote }}
 {{- end }}
-{{- end }}
 
 ---
 {{- if .Values.mcp.echarts.enabled }}
