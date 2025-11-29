@@ -9,7 +9,8 @@ postgresql:
   enabled: true
   auth:
     enablePostgresPassword: true
-    existingSecret: postgres-superuser
+    existingSecret: investlab-backend-investlab-backend-secrets
+    existingSecretPasswordKey: DATABASE_PASSWORD
 
 # Redis configuration
 redis:
