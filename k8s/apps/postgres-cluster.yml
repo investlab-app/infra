@@ -18,7 +18,6 @@ spec:
   bootstrap:
     initdb:
       database: investlab
-      owner: postgres
       secret:
         name: postgres-superuser
 
