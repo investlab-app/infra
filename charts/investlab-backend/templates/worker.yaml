@@ -67,7 +67,7 @@ spec:
               name: {{ include "investlab-backend-secrets.fullname" . }}
               key: CLERK_SECRET_KEY
         resources:
-          {{- toYaml .Values.worker.resources }}
+          {{- toYaml .Values.worker.resources | nindent 10 }}
         volumeMounts:
         - name: static-files
           mountPath: /app/static

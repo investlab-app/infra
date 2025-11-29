@@ -67,9 +67,9 @@ spec:
               name: {{ include "investlab-backend-secrets.fullname" . }}
               key: CLERK_SECRET_KEY
         resources:
-          {{- toYaml .Values.scheduler.resources }}
+          {{- toYaml .Values.scheduler.resources | nindent 10 }}
         affinity:
-        podAntiAffinity:
+          podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 100
             podAffinityTerm:

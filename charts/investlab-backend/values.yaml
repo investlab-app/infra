@@ -207,6 +207,11 @@ mcp:
       limits:
         memory: 512Mi
         cpu: 400m
+    minio:
+      endpoint: "minio.example.com"
+      port: 9000
+      useSsl: true
+      bucketName: "echarts"
 
 # Service configuration
 service:

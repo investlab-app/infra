@@ -65,7 +65,7 @@ spec:
               name: {{ include "investlab-backend-secrets.fullname" . }}
               key: POLYGON_SECRET_KEY
         resources:
-          {{- toYaml .Values.priceStream.resources }}
+          {{- toYaml .Values.priceStream.resources | nindent 10 }}
         livenessProbe:
           exec:
             command: ["pgrep", "-f", "mock_stream_prices"]

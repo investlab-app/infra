@@ -1,8 +1,12 @@
 {{/*
 Generate full resource names
 */}}
-{{- define "investlab-backend.api.fullname" -}}
+{{- define "investlab-backend.fullname" -}}
 investlab-backend-{{ .Release.Name }}
+{{- end }}
+
+{{- define "investlab-backend.api.fullname" -}}
+{{ include "investlab-backend.fullname" . }}
 {{- end }}
 
 {{- define "investlab-backend.worker.fullname" -}}
@@ -147,10 +151,18 @@ postgres-cluster
 postgres
 {{- end }}
 
+{{- define "postgres-cluster.namepspace" -}}
+postgres
+{{- end }}
+
 {{- define "redis-cluster.fullname" -}}
 redis-cluster
 {{- end }}
 
 {{- define "redis-cluster.namespace" -}}
 redis
+{{- end }}
+
+{{- define "investlab-backend-secrets.fullname" -}}
+{{ include "investlab-backend.api.fullname" . }}-secrets
 {{- end }}
