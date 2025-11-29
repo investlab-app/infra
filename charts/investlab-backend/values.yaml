@@ -118,7 +118,12 @@ scheduler:
 priceStream:
   enabled: true
   replicaCount: 1
-  command: ["uv", "run", "manage.py", "mock_stream_prices"]
+  command:
+    [
+      "sh",
+      "-c",
+      "printenv | sort; echo '---DEBUG ENV VARS---'; uv run manage.py mock_stream_prices",
+    ]
   workingDir: /app
 
   resources:
