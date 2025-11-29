@@ -51,7 +51,7 @@ api:
   # Application configuration
   config:
     djangoLogLevel: INFO
-    allowedHosts: "*"
+    allowedHosts: *
     corsAllowedOrigins: https://api.investlab.kapica.click
 
   # Persistent storage
@@ -80,6 +80,38 @@ api:
       path: /api/status
       port: 8000
     initialDelaySeconds: 30
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Web Frontend configuration
+web:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: investlab-app/web
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 3
     failureThreshold: 3
@@ -241,6 +273,7 @@ ingress:
   tls:
     - hosts:
         - api.investlab.app
+        - investlab.app
       secretName: investlab-backend-tls
   hosts:
     - host: api.investlab.app
@@ -263,6 +296,11 @@ ingress:
         - path: /mcp/echarts
           service: mcp-echarts
           port: 8051
+    - host: investlab.app
+      paths:
+        - path: /
+          service: web
+          port: 80
 
 # Auto-scaling configuration
 autoscaling:

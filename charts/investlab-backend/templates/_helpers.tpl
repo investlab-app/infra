@@ -166,3 +166,19 @@ redis
 {{- define "investlab-backend-secrets.fullname" -}}
 {{ include "investlab-backend.api.fullname" . }}-secrets
 {{- end }}
+
+{{- define "investlab-backend.web.fullname" -}}
+{{ include "investlab-backend.api.fullname" . }}-web
+{{- end }}
+
+{{- define "investlab-backend.web.labels" -}}
+app.kubernetes.io/name: investlab-backend
+app.kubernetes.io/component: web
+app.kubernetes.io/part-of: investlab
+{{- end }}
+
+{{- define "investlab-backend.web.selectorLabels" -}}
+app.kubernetes.io/name: investlab-backend
+app.kubernetes.io/component: web
+app.kubernetes.io/part-of: investlab
+{{- end }}

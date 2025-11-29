@@ -1,0 +1,54 @@
+{{- if .Values.web.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-backend.web.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.web.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-backend.web.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-backend.web.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: web
+        image: "{{ .Values.global.imageRegistry }}/{{ .Values.web.image.repository }}:{{ .Values.web.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.web.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.web.livenessProbe.httpGet.path }}
+            port: {{ .Values.web.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.web.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.web.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.web.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.web.livenessProbe.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.web.readinessProbe.httpGet.path }}
+            port: {{ .Values.web.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.web.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.web.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.web.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.web.readinessProbe.failureThreshold }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "investlab-backend.web.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
