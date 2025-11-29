@@ -43,7 +43,7 @@ spec:
         MINIO_ACCESS_KEY: "{{ .minioAccessKey }}"
         MINIO_SECRET_KEY: "{{ .minioSecretKey }}"
   data:
-    - secretKey: database-password
+    - secretKey: password
       remoteRef:
         key: {{ .Values.secrets.postgresPasswordKey }}
     - secretKey: clerk-secret-key
