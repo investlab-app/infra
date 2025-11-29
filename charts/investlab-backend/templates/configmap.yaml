@@ -12,7 +12,6 @@ data:
   ALLOWED_HOSTS: {{ .Values.api.config.allowedHosts | quote }}
   CORS_ALLOWED_ORIGINS: {{ .Values.api.config.corsAllowedOrigins | quote }}
   POSTGRES_DB: {{ .Values.api.config.postgresDb | default "investlab" | quote }}
-  POSTGRES_USER: {{ .Values.api.config.postgresUser | default "postgres" | quote }}
   POSTGRES_HOST: {{ .Values.api.config.postgresHost | default "postgres-cluster-rw.postgres.svc.cluster.local" | quote }}
   POSTGRES_PORT: {{ .Values.api.config.postgresPort | default "5432" | quote }}
   REDIS_HOST: {{ .Values.api.config.redisHost | default "redis-cluster-master.redis.svc.cluster.local" | quote }}
@@ -40,6 +39,9 @@ spec:
     name: {{ include "investlab-backend-secrets.fullname" . }}
     creationPolicy: Owner
   data:
+    - secretKey: POSTGRES_USER
+      remoteRef:
+        key: postgres-username
     - secretKey: SECRET_KEY
       remoteRef:
         key: django-secret-key
