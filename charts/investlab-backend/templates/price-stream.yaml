@@ -51,12 +51,6 @@ spec:
             name: {{ include "investlab-backend.api.fullname" . }}-config
         - secretRef:
             name: {{ include "investlab-backend-secrets.fullname" . }}
-        env:
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.postgresql.auth.existingSecret }}
-              key: password
         resources:
           {{- toYaml .Values.priceStream.resources | nindent 10 }}
         livenessProbe:

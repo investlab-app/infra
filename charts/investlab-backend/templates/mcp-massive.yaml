@@ -22,16 +22,11 @@ spec:
         image: {{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
         imagePullPolicy: Always
         command: {{ .Values.mcp.massive.command }}
-        env:
-        - name: POLYGON_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: POLYGON_SECRET_KEY
-        - name: MCP_TRANSPORT
-          value: {{ .Values.mcp.massive.transport }}
-        - name: MASSIVE_MCP_HOST
-          value: {{ .Values.mcp.massive.host }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-mcp.massive.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
         ports:
         - containerPort: 8000
           name: http

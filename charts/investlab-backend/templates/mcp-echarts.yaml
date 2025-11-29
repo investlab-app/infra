@@ -22,25 +22,11 @@ spec:
         image: {{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "18-alpine" }}
         imagePullPolicy: Always
         command: {{ .Values.mcp.echarts.command }}
-        env:
-        - name: MINIO_ENDPOINT
-          value: {{ .Values.mcp.echarts.minio.endpoint }}
-        - name: MINIO_PORT
-          value: {{ .Values.mcp.echarts.minio.port | quote }}
-        - name: MINIO_USE_SSL
-          value: {{ .Values.mcp.echarts.minio.useSsl | quote }}
-        - name: MINIO_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: MINIO_ACCESS_KEY
-        - name: MINIO_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: MINIO_SECRET_KEY
-        - name: MINIO_BUCKET_NAME
-          value: {{ .Values.mcp.echarts.minio.bucketName }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-mcp.echarts.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
         ports:
         - containerPort: 8000
           name: http
