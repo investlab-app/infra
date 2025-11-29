@@ -21,7 +21,8 @@ spec:
       - name: echarts
         image: {{ .Values.mcp.echarts.image.registry }}/{{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "22-alpine" }}
         imagePullPolicy: Always
-        command: {{ .Values.mcp.echarts.command }}
+        command: 
+          {{- toYaml .Values.mcp.echarts.command | nindent 10 }}
         envFrom:
         - configMapRef:
             name: {{ include "investlab-mcp.echarts.fullname" . }}-config
