@@ -42,6 +42,9 @@ spec:
     - secretKey: POSTGRES_USER
       remoteRef:
         key: postgres-username
+    - secretKey: POSTGRES_PASSWORD
+      remoteRef:
+        key: postgres-password
     - secretKey: SECRET_KEY
       remoteRef:
         key: django-secret-key
