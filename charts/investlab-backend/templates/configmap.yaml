@@ -28,7 +28,6 @@ data:
 
 ---
 # External Secrets Secret
-{{- if .Values.secrets.enabled }}
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
@@ -39,8 +38,8 @@ metadata:
 spec:
   refreshInterval: 1h
   secretStoreRef:
-    name: {{ .Values.secrets.store }}
-    kind: {{ .Values.secrets.storeKind }}
+    name: oci-vault
+    kind: ClusterSecretStore
   target:
     name: {{ include "investlab-backend-secrets.fullname" . }}
     creationPolicy: Owner
@@ -49,11 +48,11 @@ spec:
       data:
         SECRET_KEY: "{{ .secretKey }}"
         POSTGRES_PASSWORD: "{{ .databasePassword }}"
-        password: "{{ .databasePassword }}"
         CLERK_SECRET_KEY: "{{ .clerkSecretKey }}"
         CLERK_ISSUER: "{{ .clerkIssuer }}"
         CLERK_JWT_KEY: "{{ .clerkJwtKey }}"
         POLYGON_SECRET_KEY: "{{ .polygonSecretKey }}"
+        ALPACA_PUBLIC_KEY: "{{ .alpacaPublicKey }}"
         ALPACA_SECRET_KEY: "{{ .alpacaSecretKey }}"
         MINIO_ACCESS_KEY: "{{ .minioAccessKey }}"
         MINIO_SECRET_KEY: "{{ .minioSecretKey }}"
@@ -69,10 +68,10 @@ spec:
         key: django-secret-key
     - secretKey: databasePassword
       remoteRef:
-        key: {{ .Values.secrets.postgresPasswordKey }}
+        key: postgres-password
     - secretKey: clerkSecretKey
       remoteRef:
-        key: {{ .Values.secrets.clerkSecretKey }}
+        key: clerk-secret-key
     - secretKey: clerkIssuer
       remoteRef:
         key: clerk-issuer
@@ -81,35 +80,37 @@ spec:
         key: clerk-jwt-key
     - secretKey: polygonSecretKey
       remoteRef:
-        key: {{ .Values.secrets.polygonSecretKey }}
+        key: polygon-secret-key
+    - secretKey: alpacaPublicKey
+      remoteRef:
+        key: alpaca-public-key
     - secretKey: alpacaSecretKey
       remoteRef:
-        key: {{ .Values.secrets.alpacaSecretKey }}
+        key: alpaca-secret-key
     - secretKey: minioAccessKey
       remoteRef:
-        key: {{ .Values.secrets.minioAccessKey }}
+        key: minio-access-key
     - secretKey: minioSecretKey
       remoteRef:
-        key: {{ .Values.secrets.minioSecretKey }}
+        key: minio-secret-key
     - secretKey: openaiApiKey
       remoteRef:
-        key: {{ .Values.secrets.openaiApiKey }}
+        key: openai-api-key
     - secretKey: geminiApiKey
       remoteRef:
-        key: {{ .Values.secrets.geminiApiKey }}
+        key: gemini-api-key
     - secretKey: vapidPrivateKey
       remoteRef:
-        key: {{ .Values.secrets.vapidPrivateKey }}
+        key: vapid-private-key
     - secretKey: vapidPublicKey
       remoteRef:
-        key: {{ .Values.secrets.vapidPublicKey }}
+        key: vapid-public-key
     - secretKey: adminEmail
       remoteRef:
-        key: {{ .Values.secrets.adminEmail }}
+        key: admin-email
     - secretKey: fromEmail
       remoteRef:
-        key: {{ .Values.secrets.fromEmail }}
-{{- end }}
+        key: from-email
 
 ---
 # Static files PVC
