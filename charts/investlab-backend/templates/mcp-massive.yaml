@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: massive
-        image: {{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
+        image: {{ .Values.global.imageRegistry }}/{{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
         imagePullPolicy: Always
         command: {{ .Values.mcp.massive.command }}
         envFrom:
