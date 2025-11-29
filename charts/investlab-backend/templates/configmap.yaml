@@ -90,6 +90,9 @@ spec:
     - secretKey: FROM_EMAIL
       remoteRef:
         key: from-email
+    - secretKey: REDIS_PASSWORD
+      remoteRef:
+        key: redis-password
 
 ---
 # Static files PVC
