@@ -51,7 +51,7 @@ api:
   # Application configuration
   config:
     djangoLogLevel: INFO
-    allowedHosts: api.investlab.app,backend,localhost
+    allowedHosts: "*"
     corsAllowedOrigins: https://api.investlab.kapica.click
 
   # Persistent storage
