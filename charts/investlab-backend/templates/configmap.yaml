@@ -36,7 +36,7 @@ spec:
     template:
       type: Opaque
       data:
-        DATABASE_PASSWORD: "{{ .databasePassword }}"
+        password: "{{ .databasePassword }}"
         CLERK_SECRET_KEY: "{{ .clerkSecretKey }}"
         POLYGON_SECRET_KEY: "{{ .polygonSecretKey }}"
         ALPACA_SECRET_KEY: "{{ .alpacaSecretKey }}"
