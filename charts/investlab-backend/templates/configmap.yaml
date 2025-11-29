@@ -20,6 +20,8 @@ data:
   OPENAI_TRANSLATING_MODEL: {{ .Values.api.config.openaiTranslatingModel | default "llama-3.1-8b-instant" | quote }}
   TRANSLATE_INSTRUMENT_DESCRIPTION: {{ .Values.api.config.translateInstrumentDescription | default "false" | quote }}
   EMAIL_BACKEND: {{ .Values.api.config.emailBackend | default "django.core.mail.backends.console.EmailBackend" | quote }}
+  MCP_MASSIVE_URL: {{ .Values.api.config.mcpMassiveUrl | default (printf "http://%s-mcp-massive.%s.svc.cluster.local:8050/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
+  MCP_ECHARTS_URL: {{ .Values.api.config.mcpEchartsUrl | default (printf "http://%s-mcp-echarts.%s.svc.cluster.local:8051/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
 
 ---
 # External Secrets Secret

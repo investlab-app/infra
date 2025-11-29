@@ -53,6 +53,9 @@ api:
     djangoLogLevel: INFO
     allowedHosts: "*"
     corsAllowedOrigins: https://api.investlab.kapica.click
+    # MCP Service URLs (optional - defaults to internal k8s services)
+    # mcpMassiveUrl: "http://custom-mcp-massive:8000/mcp"
+    # mcpEchartsUrl: "http://custom-mcp-echarts:8000/mcp"
 
   # Persistent storage
   persistence:
