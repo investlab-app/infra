@@ -4,34 +4,27 @@ metadata:
   name: postgres-cluster
   namespace: postgres
   annotations:
-    argocd.argoproj.io/sync-wave: "10" # After secrets are ready
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   instances: 2
-
-  # PostgreSQL 17 to match local development
   imageName: ghcr.io/cloudnative-pg/postgresql:17
 
-  # Storage configuration
   storage:
     size: 10Gi
     storageClass: oci-bv
 
-  # Bootstrap configuration
   bootstrap:
     initdb:
       database: investlab
       secret:
         name: postgres-superuser
 
-  # Superuser credentials from External Secrets
   superuserSecret:
     name: postgres-superuser
 
-  # Monitoring configuration
   monitoring:
     enablePodMonitor: false
 
-  # Resources (adjust based on workload)
   resources:
     requests:
       memory: "256Mi"
@@ -40,7 +33,6 @@ spec:
       memory: "1Gi"
       cpu: "1"
 
-  # PostgreSQL configuration
   postgresql:
     parameters:
       max_connections: "100"
