@@ -43,7 +43,7 @@ api:
   resources:
     requests:
       memory: 512Mi
-      cpu: 250m
+      cpu: 100m
     limits:
       memory: 1Gi
       cpu: 500m
@@ -95,7 +95,7 @@ web:
   resources:
     requests:
       memory: 128Mi
-      cpu: 100m
+      cpu: 50m
     limits:
       memory: 256Mi
       cpu: 200m
@@ -126,7 +126,7 @@ worker:
   resources:
     requests:
       memory: 512Mi
-      cpu: 200m
+      cpu: 100m
     limits:
       memory: 2Gi
       cpu: 500m
@@ -141,7 +141,7 @@ scheduler:
   resources:
     requests:
       memory: 256Mi
-      cpu: 100m
+      cpu: 50m
     limits:
       memory: 512Mi
       cpu: 250m
@@ -161,7 +161,7 @@ priceStream:
   resources:
     requests:
       memory: 512Mi
-      cpu: 250m
+      cpu: 100m
     limits:
       memory: 1Gi
       cpu: 500m
@@ -176,7 +176,7 @@ priceNotifier:
   resources:
     requests:
       memory: 256Mi
-      cpu: 200m
+      cpu: 50m
     limits:
       memory: 512Mi
       cpu: 400m
@@ -191,7 +191,7 @@ orderEngine:
   resources:
     requests:
       memory: 1Gi
-      cpu: 500m
+      cpu: 100m
     limits:
       memory: 2Gi
       cpu: 1
