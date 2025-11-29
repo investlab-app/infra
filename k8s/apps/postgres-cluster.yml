@@ -22,6 +22,8 @@ spec:
   superuserSecret:
     name: postgres-superuser
 
+  enableSuperuserAccess: true
+
   monitoring:
     enablePodMonitor: false
 
