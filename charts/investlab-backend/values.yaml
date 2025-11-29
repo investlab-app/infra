@@ -50,13 +50,9 @@ api:
 
   # Application configuration
   config:
-    databaseUrl: "postgres://postgres:password@postgres-cluster-rw.postgres.svc.cluster.local:5432/investlab"
-    redisUrl: "redis://:password@redis-cluster-master.redis.svc.cluster.local:6379/0"
-    djangoSettingsModule: config.settings.prod
     djangoLogLevel: INFO
     allowedHosts: api.investlab.app,backend,localhost
     corsAllowedOrigins: https://api.investlab.kapica.click
-    environment: production
 
   # Persistent storage
   persistence:
