@@ -31,7 +31,7 @@ redis:
 # Main Django API configuration
 api:
   enabled: true
-  replicaCount: 3
+  replicaCount: 1
   image:
     repository: investlab-app/backend
     tag: latest
@@ -40,11 +40,11 @@ api:
   # Resource configuration
   resources:
     requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
       memory: 1Gi
       cpu: 500m
-    limits:
-      memory: 2Gi
-      cpu: 1
 
   # Application configuration
   config:
@@ -89,16 +89,16 @@ api:
 # Celery Worker configuration
 worker:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   command: ["uv", "run", "celery", "-A", "config", "worker", "-l", "info"]
 
   resources:
     requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
       memory: 512Mi
       cpu: 250m
-    limits:
-      memory: 1Gi
-      cpu: 500m
 
 # Celery Beat Scheduler configuration
 scheduler:
@@ -260,13 +260,13 @@ ingress:
 autoscaling:
   enabled: true
   api:
-    minReplicas: 3
-    maxReplicas: 10
+    minReplicas: 1
+    maxReplicas: 3
     targetCPUUtilization: 70
     targetMemoryUtilization: 80
   worker:
-    minReplicas: 2
-    maxReplicas: 6
+    minReplicas: 1
+    maxReplicas: 2
     targetCPUUtilization: 70
     targetMemoryUtilization: 80
 
