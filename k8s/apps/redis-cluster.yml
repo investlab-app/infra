@@ -30,15 +30,15 @@ spec:
         master:
           persistence:
             enabled: true
-            size: 32Gi
+            size: 10Gi
             storageClass: oci-bv
           resources:
             requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
               memory: "1Gi"
               cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1"
           affinity:
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:
@@ -57,15 +57,15 @@ spec:
           replicaCount: 3
           persistence:
             enabled: true
-            size: 32Gi
+            size: 10Gi
             storageClass: oci-bv
           resources:
             requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
               memory: "1Gi"
               cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1"
           affinity:
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:
