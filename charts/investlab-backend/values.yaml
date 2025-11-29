@@ -1,7 +1,8 @@
 # Global configuration
 global:
   imageRegistry: ghcr.io
-  imagePullSecrets: []
+  imagePullSecrets:
+    - name: ghcr-secret
 
 # Database configuration
 postgresql:
