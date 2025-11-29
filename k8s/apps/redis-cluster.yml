@@ -85,7 +85,7 @@ spec:
           image:
             registry: docker.io
             repository: bitnami/redis-exporter
-            tag: 1-debian-12  # <--- Uses the latest stable 1.x version
+            tag: 1-debian-12
             pullPolicy: Always
           serviceMonitor:
             enabled: true
