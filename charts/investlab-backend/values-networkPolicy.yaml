@@ -2,21 +2,22 @@
 networkPolicy:
   enabled: true
   ingress:
-    # Allow traffic from ingress controller
+    # Allow traffic from ingress controller and frontend
     - from:
         - namespaceSelector:
             matchLabels:
               name: ingress-nginx
-      # Allow traffic from frontend
-      - namespaceSelector:
+        - namespaceSelector:
             matchLabels:
               name: web
     # Allow traffic from database namespace
-    - namespaceSelector:
+    - from:
+        - namespaceSelector:
             matchLabels:
               name: postgres
     # Allow traffic from redis namespace
-    - namespaceSelector:
+    - from:
+        - namespaceSelector:
             matchLabels:
               name: redis
   egress:

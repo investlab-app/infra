@@ -29,10 +29,3 @@ dependencies:
     version: "8.x.x"
     condition: redis.enabled
 kubeVersion: ">=1.25.0-0"
-
-# Subcharts for optional components
-dependencies:
-  - name: redis
-    version: "20.3.0"
-    repository: "https://charts.bitnami.com/bitnami"
-    condition: redis.enabled

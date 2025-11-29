@@ -16,11 +16,11 @@ spec:
     helm:
       valueFiles:
         - values.yaml
-        - secrets.yaml
-        - database.yaml
-        - redis.yaml
-        - monitoring.yaml
-        - networkPolicy.yaml
+        - values-secrets.yaml
+        - values-database.yaml
+        - values-redis.yaml
+        - values-monitoring.yaml
+        - values-networkPolicy.yaml
       releaseName: investlab-backend
   destination:
     server: https://kubernetes.default.svc
