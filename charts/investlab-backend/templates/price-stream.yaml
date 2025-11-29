@@ -46,51 +46,17 @@ spec:
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         workingDir: {{ .Values.priceStream.workingDir | default "/app" }}
         command: {{ toYaml .Values.priceStream.command | nindent 8 }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-backend.api.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
         env:
-        - name: DATABASE_URL
-          value: {{ .Values.api.config.databaseUrl }}
-        - name: REDIS_URL
-          value: {{ .Values.api.config.redisUrl }}
-        - name: DJANGO_SETTINGS_MODULE
-          value: {{ .Values.api.config.djangoSettingsModule }}
-        - name: DJANGO_LOG_LEVEL
-          value: {{ .Values.api.config.djangoLogLevel }}
         - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ .Values.postgresql.auth.existingSecret }}
               key: password
-        - name: SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: SECRET_KEY
-        - name: CLERK_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: CLERK_SECRET_KEY
-        - name: CLERK_ISSUER
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: CLERK_ISSUER
-        - name: CLERK_JWT_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: CLERK_JWT_KEY
-        - name: ALLOWED_HOSTS
-          value: {{ .Values.api.config.allowedHosts }}
-        - name: CORS_ALLOWED_ORIGINS
-          value: {{ .Values.api.config.corsAllowedOrigins }}
-        - name: ENVIRONMENT
-          value: {{ .Values.api.config.environment }}
-        - name: POLYGON_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "investlab-backend-secrets.fullname" . }}
-              key: POLYGON_SECRET_KEY
         resources:
           {{- toYaml .Values.priceStream.resources | nindent 10 }}
         livenessProbe:
