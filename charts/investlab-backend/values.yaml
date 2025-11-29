@@ -267,16 +267,16 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-read-timeout: 300
     nginx.ingress.kubernetes.io/proxy-send-timeout: 300
-    nginx.ingress.kubernetes.io/cors-allow-origin: https://api.investlab.app
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://api.investlab.kapica.click
     nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
     nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization
   tls:
     - hosts:
-        - api.investlab.app
-        - investlab.app
+        - api.investlab.kapica.click
+        - investlab.kapica.click
       secretName: investlab-backend-tls
   hosts:
-    - host: api.investlab.app
+    - host: api.investlab.kapica.click
       paths:
         - path: /api
           service: api
@@ -296,7 +296,7 @@ ingress:
         - path: /mcp/echarts
           service: mcp-echarts
           port: 8051
-    - host: investlab.app
+    - host: investlab.kapica.click
       paths:
         - path: /
           service: web
