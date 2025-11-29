@@ -21,7 +21,8 @@ spec:
       - name: massive
         image: {{ .Values.mcp.massive.image.registry }}/{{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
         imagePullPolicy: Always
-        command: {{ .Values.mcp.massive.command }}
+        command:
+          {{- toYaml .Values.mcp.massive.command | nindent 10 }}
         envFrom:
         - configMapRef:
             name: {{ include "investlab-mcp.massive.fullname" . }}-config
