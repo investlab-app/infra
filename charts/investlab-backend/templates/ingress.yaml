@@ -18,7 +18,6 @@ spec:
       {{- range .Values.ingress.tls.hosts }}- {{ . }}: {{ include "investlab-backend.fullname" . }}-tls{{- end }}
     secretName: {{ include "investlab-backend.fullname" . }}-tls
   {{- end }}
-  {{- end }}
   rules:
   - host: {{ .Values.ingress.host }}
     http:
