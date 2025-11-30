@@ -83,6 +83,12 @@ spec:
           kubeStateMetricsEnabled: true
           kubeStateMetricsCore:
             enabled: true
+            collectSecretMetrics: false
+            collectVpaMetrics: true
+
+          # Orchestrator Explorer for full K8s resource visibility
+          orchestratorExplorer:
+            enabled: true
 
           # Prometheus scraping
           prometheusScrape:
