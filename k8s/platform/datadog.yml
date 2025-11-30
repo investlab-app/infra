@@ -25,6 +25,9 @@ spec:
     - secretKey: api-key
       remoteRef:
         key: datadog-api-key
+    - secretKey: redis-password
+      remoteRef:
+        key: redis-password
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -43,8 +46,19 @@ spec:
       values: |
         datadog:
           clusterName: investlab
-          site: datadoghq.eu
+          site: us5.datadoghq.com
           apiKeyExistingSecret: datadog-secret
+
+          # Redis integration with authentication
+          confd:
+            redisdb.yaml: |-
+              ad_identifiers:
+                - redis
+              init_config:
+              instances:
+                - host: redis-cluster-master.redis.svc.cluster.local
+                  port: 6379
+                  password: ENC[k8s_secret@datadog/datadog-secret/redis-password]
 
           # Logs
           logs:
