@@ -64,11 +64,11 @@ api:
   # Persistent storage
   persistence:
     static:
-      enabled: true
+      enabled: false # Using emptyDir + collectstatic init container
       size: 5Gi
       storageClass: oci-bv
     media:
-      enabled: true
+      enabled: false # Using MinIO for media storage
       size: 10Gi
       storageClass: oci-bv
 

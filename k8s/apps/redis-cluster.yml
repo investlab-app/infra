@@ -29,9 +29,7 @@ spec:
         # Architecture - High availability with replication
         master:
           persistence:
-            enabled: true
-            size: 10Gi
-            storageClass: oci-bv
+            enabled: false
           resources:
             requests:
               memory: "256Mi"
@@ -54,11 +52,9 @@ spec:
 
         # Replica configuration for read scaling
         replica:
-          replicaCount: 2
+          replicaCount: 1
           persistence:
-            enabled: true
-            size: 10Gi
-            storageClass: oci-bv
+            enabled: false
           resources:
             requests:
               memory: "256Mi"
