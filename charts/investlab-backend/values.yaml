@@ -262,7 +262,7 @@ mcp:
         memory: 512Mi
         cpu: 400m
     minio:
-      endpoint: "s3.us-east-1.amazonaws.com"
+      endpoint: "media.investlab.kapica.click"
       port: 443
       useSsl: true
       bucketName: "investlab-echarts-mcp"

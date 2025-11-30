@@ -24,6 +24,9 @@ spec:
           - name: investlab-media
             policy: public
             purge: false
+          - name: investlab-echarts-mcp
+            policy: public
+            purge: false
 
         resources:
           requests:
