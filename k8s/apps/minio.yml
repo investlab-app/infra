@@ -13,12 +13,14 @@ spec:
     targetRevision: 17.0.21
     helm:
       values: |
+        # --- 1. Main MinIO Server Image (Use specific r3 tag) ---
         image:
           registry: docker.io
           repository: bitnami/minio
           tag: 2025.7.23-debian-12-r3
           pullPolicy: IfNotPresent
 
+        # --- 2. Console Image (Use specific r3 tag) ---
         console:
           enabled: true
           image:
@@ -29,6 +31,7 @@ spec:
           service:
             type: ClusterIP
 
+        # --- 3. Volume Permissions (Use latest for os-shell) ---
         defaultInitContainers:
           volumePermissions:
             enabled: true
@@ -38,6 +41,7 @@ spec:
               tag: latest
               pullPolicy: IfNotPresent
 
+        # --- Standard Configuration ---
         auth:
           existingSecret: minio-auth
         defaultBuckets: "investlab-media"
