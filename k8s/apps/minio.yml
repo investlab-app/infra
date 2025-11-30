@@ -14,8 +14,10 @@ spec:
     helm:
       values: |
         image:
-          tag: latest
-          pullPolicy: Always
+          registry: docker.io
+          repository: bitnami/minio
+          tag: 2025.7.23-debian-12-r3
+          pullPolicy: IfNotPresent
 
         console:
           enabled: false
