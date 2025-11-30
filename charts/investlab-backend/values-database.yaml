@@ -1,7 +1,0 @@
-# PostgreSQL configuration (via CloudNativePG dependency)
-postgresql:
-  enabled: true
-  auth:
-    enablePostgresPassword: true
-    existingSecret: investlab-backend-investlab-backend-secrets
-    existingSecretPasswordKey: password
