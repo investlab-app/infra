@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: datadog
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: datadog-api-key
+  namespace: datadog
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: oci-vault
+    kind: ClusterSecretStore
+  target:
+    name: datadog-secret
+    creationPolicy: Owner
+  data:
+    - secretKey: api-key
+      remoteRef:
+        key: datadog-api-key
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: datadog
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.datadoghq.com
+    chart: datadog
+    targetRevision: 3.87.1
+    helm:
+      values: |
+        datadog:
+          clusterName: investlab
+          site: datadoghq.eu
+          apiKeyExistingSecret: datadog-secret
+
+          # Logs
+          logs:
+            enabled: true
+            containerCollectAll: true
+
+          # APM
+          apm:
+            portEnabled: true
+            socketEnabled: true
+
+          # Process monitoring
+          processAgent:
+            enabled: true
+            processCollection: true
+
+          # Network Performance Monitoring
+          networkMonitoring:
+            enabled: false
+
+          # Kubernetes integrations
+          kubeStateMetricsEnabled: true
+          kubeStateMetricsCore:
+            enabled: true
+
+          # Prometheus scraping
+          prometheusScrape:
+            enabled: true
+            serviceEndpoints: true
+
+        clusterAgent:
+          enabled: true
+          replicas: 2
+          createPodDisruptionBudget: true
+          admissionController:
+            enabled: true
+            mutateUnlabelled: false
+          metricsProvider:
+            enabled: false
+
+        agents:
+          tolerations:
+            - operator: Exists
+          priorityClassName: system-node-critical
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: datadog
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
