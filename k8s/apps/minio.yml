@@ -13,29 +13,29 @@ spec:
     targetRevision: 17.0.21
     helm:
       values: |
-        auth:
-          existingSecret: minio-auth
-          
-        defaultBuckets: "investlab-media"
-        
-        persistence:
-          enabled: true
-          size: 10Gi
-          storageClass: oci-bv
+        image:
+          tag: latest
+          pullPolicy: Always
+
+        console:
+          enabled: false
 
         defaultInitContainers:
           volumePermissions:
             enabled: true
 
-        console:
-          enabled: false
-
+        auth:
+          existingSecret: minio-auth
+        defaultBuckets: "investlab-media"
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClass: oci-bv
         service:
           type: ClusterIP
           ports:
             api: 9000
             console: 9001
-
         resources:
           requests:
             memory: 256Mi
@@ -43,7 +43,6 @@ spec:
           limits:
             memory: 512Mi
             cpu: 500m
-            
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
