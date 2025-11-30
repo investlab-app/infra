@@ -23,6 +23,12 @@ data:
   EMAIL_BACKEND: {{ .Values.api.config.emailBackend | default "django.core.mail.backends.console.EmailBackend" | quote }}
   MCP_MASSIVE_URL: {{ .Values.api.config.mcpMassiveUrl | default (printf "http://%s-mcp-massive.%s.svc.cluster.local:8050/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
   MCP_ECHARTS_URL: {{ .Values.api.config.mcpEchartsUrl | default (printf "http://%s-mcp-echarts.%s.svc.cluster.local:8051/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
+  USE_MINIO: {{ .Values.api.config.useMinio | quote }}
+  MINIO_ENDPOINT: {{ .Values.api.config.minioEndpoint | quote }}
+  MINIO_PORT: {{ .Values.api.config.minioPort | quote }}
+  MINIO_USE_SSL: {{ .Values.api.config.minioUseSsl | quote }}
+  MINIO_BUCKET_NAME: {{ .Values.api.config.minioBucketName | quote }}
+  MINIO_REGION_NAME: {{ .Values.api.config.minioRegionName | quote }}
 
 ---
 # External Secrets Secret

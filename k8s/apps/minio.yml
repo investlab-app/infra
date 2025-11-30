@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: minio
+    targetRevision: 12.8.0
+    helm:
+      values: |
+        auth:
+          existingSecret: minio-auth
+        defaultBuckets: "investlab-media"
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClass: oci-bv
+        service:
+          type: ClusterIP
+          ports:
+            api: 9000
+            console: 9001
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

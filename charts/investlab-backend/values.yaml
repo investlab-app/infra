@@ -60,6 +60,14 @@ api:
     # mcpMassiveUrl: "http://custom-mcp-massive:8000/mcp"
     # mcpEchartsUrl: "http://custom-mcp-echarts:8000/mcp"
 
+    # S3 / MinIO Configuration
+    useMinio: "true"
+    minioEndpoint: "minio.minio.svc.cluster.local"
+    minioPort: "9000"
+    minioUseSsl: "false"
+    minioBucketName: "investlab-media"
+    minioRegionName: "us-east-1"
+
   # Persistent storage
   persistence:
     static:
