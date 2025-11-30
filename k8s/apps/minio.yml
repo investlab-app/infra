@@ -3,70 +3,32 @@ kind: Application
 metadata:
   name: minio
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://charts.bitnami.com/bitnami
+    repoURL: https://charts.min.io/
     chart: minio
-    targetRevision: 17.0.21
+    targetRevision: 5.3.0
     helm:
       values: |
-        # --- 1. Main MinIO Server Image (Use specific r3 tag) ---
-        image:
-          registry: docker.io
-          repository: bitnami/minio
-          tag: 2025.7.23-debian-12-r3
-          pullPolicy: IfNotPresent
-
-        # --- 2. Console Image (Use specific r3 tag) ---
-        console:
-          enabled: true
-          image:
-            registry: docker.io
-            repository: bitnami/minio-object-browser
-            tag: 2.0.2-debian-12-r3
-            pullPolicy: IfNotPresent
-          service:
-            type: ClusterIP
-
-        # --- 3. Volume Permissions (Use latest for os-shell) ---
-        defaultInitContainers:
-          volumePermissions:
-            enabled: true
-            image:
-              registry: docker.io
-              repository: bitnami/os-shell
-              tag: latest
-              pullPolicy: IfNotPresent
-
-        # --- Standard Configuration ---
-        auth:
-          existingSecret: minio-auth
-        defaultBuckets: "investlab-media"
+        rootUser: admin
+        rootPassword: password123
+        
+        mode: standalone
+        
         persistence:
           enabled: true
           size: 10Gi
           storageClass: oci-bv
-        service:
-          type: ClusterIP
-          ports:
-            api: 9000
-            
+          
+        buckets:
+          - name: investlab-media
+            policy: none
+            purge: false
+
         resources:
           requests:
             memory: 256Mi
-            cpu: 100m
-          limits:
-            memory: 512Mi
-            cpu: 500m
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
