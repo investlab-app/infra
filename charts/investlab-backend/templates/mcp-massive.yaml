@@ -17,6 +17,18 @@ spec:
       labels:
         {{- include "investlab-mcp.massive.labels" . | nindent 8 }}
     spec:
+      endpoints:
+        - path: /metrics
+          port: http
+          targetPort: 8000
+      namespaceSelector:
+        matchLabels:
+          name: monitoring
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: api
+          app.kubernetes.io/name: investlab-backend
+          app.kubernetes.io/part-of: investlab
       containers:
       - name: massive
         image: {{ .Values.mcp.massive.image.registry }}/{{ .Values.mcp.massive.image.repository }}:{{ .Values.mcp.massive.image.tag | default "latest" }}
