@@ -27,9 +27,22 @@ data:
   MINIO_ENDPOINT: {{ .Values.api.config.minioEndpoint | quote }}
   MINIO_PORT: {{ .Values.api.config.minioPort | quote }}
   MINIO_USE_SSL: {{ .Values.api.config.minioUseSsl | quote }}
-  MINIO_BUCKET_NAME: {{ .Values.api.config.minioBucketName | quote }}
+  MINIO_MEDIA_BUCKET_NAME: {{ .Values.api.config.minioMediaBucketName | quote }}
+  MINIO_STATIC_BUCKET_NAME: {{ .Values.api.config.minioStaticBucketName | quote }}
   MINIO_REGION_NAME: {{ .Values.api.config.minioRegionName | quote }}
   MINIO_PUBLIC_DOMAIN: {{ .Values.api.config.minioPublicDomain | quote }}
+  DD_TRACE_ENABLED: {{ .Values.api.config.datadog.traceEnabled | default "false" | quote }}
+  DD_SERVICE: {{ .Values.api.config.datadog.service | default "investlab-backend" | quote }}
+  DD_ENV: {{ .Values.api.config.datadog.env | default "production" | quote }}
+  DD_VERSION: {{ .Values.api.config.datadog.version | default "0.1.0" | quote }}
+  DD_AGENT_HOST: {{ .Values.api.config.datadog.agentHost | default "datadog-agent.datadog.svc.cluster.local" | quote }}
+  DD_TRACE_AGENT_PORT: {{ .Values.api.config.datadog.traceAgentPort | default "8126" | quote }}
+  DD_LOGS_INJECTION: {{ .Values.api.config.datadog.logsInjection | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_MIDDLEWARE: {{ .Values.api.config.datadog.instrumentMiddleware | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_DATABASES: {{ .Values.api.config.datadog.instrumentDatabases | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_CACHES: {{ .Values.api.config.datadog.instrumentCaches | default "true" | quote }}
+  DD_TRACE_SAMPLE_RATE: {{ .Values.api.config.datadog.traceSampleRate | default "1.0" | quote }}
+  DD_PROFILING_ENABLED: {{ .Values.api.config.datadog.profilingEnabled | default "false" | quote }}
 
 ---
 # External Secrets Secret

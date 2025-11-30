@@ -57,9 +57,25 @@ api:
     minioEndpoint: "minio.minio.svc.cluster.local"
     minioPort: "9000"
     minioUseSsl: "false"
-    minioBucketName: "investlab-media"
+    minioMediaBucketName: "investlab-media"
+    minioStaticBucketName: "investlab-static"
     minioRegionName: "us-east-1"
-    minioPublicDomain: "media.investlab.kapica.click/investlab-media"
+    minioPublicDomain: "minio.investlab.kapica.click"
+
+    # Datadog APM Configuration
+    datadog:
+      traceEnabled: "true"
+      service: "investlab-backend"
+      env: "production"
+      version: "0.1.0"
+      agentHost: "datadog-agent.datadog.svc.cluster.local"
+      traceAgentPort: "8126"
+      logsInjection: "true"
+      instrumentMiddleware: "true"
+      instrumentDatabases: "true"
+      instrumentCaches: "true"
+      traceSampleRate: "1.0"
+      profilingEnabled: "false"
 
   # Persistent storage
   persistence:
@@ -287,27 +303,15 @@ ingress:
         - path: /api
           service: api
           port: 8000
-        - path: /admin
-          service: api
-          port: 8000
         - path: /static
           service: api
           port: 8000
         - path: /media
           service: api
           port: 8000
-        - path: /mcp/massive
-          service: mcp-massive
-          port: 8050
-        - path: /mcp/echarts
-          service: mcp-echarts
-          port: 8051
     - host: investlab.kapica.click
       paths:
         - path: /api
-          service: api
-          port: 8000
-        - path: /admin
           service: api
           port: 8000
         - path: /static
