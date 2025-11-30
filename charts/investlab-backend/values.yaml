@@ -245,7 +245,7 @@ mcp:
     image:
       registry: mirror.gcr.io/library
       repository: node
-      tag: 22-alpine
+      tag: 22-slim
     command: ["/bin/sh", "-c", "npx -y mcp-echarts -t streamable --port 8000"]
     ports:
       - port: 8051

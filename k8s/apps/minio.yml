@@ -13,9 +13,9 @@ spec:
       values: |
         rootUser: admin
         rootPassword: password123
-        
+
         mode: standalone
-        
+
         persistence:
           enabled: true
           size: 10Gi
@@ -23,12 +23,44 @@ spec:
           
         buckets:
           - name: investlab-media
-            policy: none
+            policy: public
             purge: false
 
         resources:
           requests:
             memory: 256Mi
+
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+            nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+          hosts:
+            - media.investlab.app
+          tls:
+            - secretName: minio-tls
+              hosts:
+                - media.investlab.app
+
+        consoleIngress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          hosts:
+            - minio-console.investlab.app
+          tls:
+            - secretName: minio-console-tls
+              hosts:
+                - minio-console.investlab.app
+
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
