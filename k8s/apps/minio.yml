@@ -23,6 +23,11 @@ spec:
         defaultInitContainers:
           volumePermissions:
             enabled: true
+            image:
+              registry: docker.io
+              repository: bitnami/os-shell
+              tag: latest
+              pullPolicy: Always
 
         auth:
           existingSecret: minio-auth
