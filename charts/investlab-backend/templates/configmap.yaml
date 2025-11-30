@@ -29,6 +29,7 @@ data:
   MINIO_USE_SSL: {{ .Values.api.config.minioUseSsl | quote }}
   MINIO_BUCKET_NAME: {{ .Values.api.config.minioBucketName | quote }}
   MINIO_REGION_NAME: {{ .Values.api.config.minioRegionName | quote }}
+  MINIO_PUBLIC_DOMAIN: {{ .Values.api.config.minioPublicDomain | quote }}
 
 ---
 # External Secrets Secret

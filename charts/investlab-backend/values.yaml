@@ -67,6 +67,7 @@ api:
     minioUseSsl: "false"
     minioBucketName: "investlab-media"
     minioRegionName: "us-east-1"
+    minioPublicDomain: "media.investlab.kapica.click/investlab-media"
 
   # Persistent storage
   persistence:
