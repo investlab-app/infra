@@ -42,11 +42,11 @@ spec:
             cert-manager.io/cluster-issuer: letsencrypt-prod
             nginx.ingress.kubernetes.io/proxy-body-size: "50m"
           hosts:
-            - media.investlab.kapica.click
+            - minio.investlab.kapica.click
           tls:
             - secretName: minio-tls
               hosts:
-                - media.investlab.kapica.click
+                - minio.investlab.kapica.click
 
         consoleIngress:
           enabled: true
