@@ -55,14 +55,14 @@ spec:
           {{- toYaml .Values.priceStream.resources | nindent 10 }}
         livenessProbe:
           exec:
-            command: ["pgrep", "-f", "mock_stream_prices"]
+            command: ["pgrep", "-f", "stream_prices"]
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
         readinessProbe:
           exec:
-            command: ["pgrep", "-f", "mock_stream_prices"]
+            command: ["pgrep", "-f", "stream_prices"]
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 3
