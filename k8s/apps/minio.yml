@@ -21,6 +21,9 @@ spec:
           storageClass: oci-bv
           
         buckets:
+          - name: investlab-static
+            policy: public
+            purge: false
           - name: investlab-media
             policy: public
             purge: false
