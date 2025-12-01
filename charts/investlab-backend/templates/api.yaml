@@ -94,16 +94,16 @@ spec:
           {{- toYaml .Values.api.resources | nindent 10 }}
         livenessProbe:
           httpGet:
-            path: /api/status
-            port: 8000
+            path: {{ .Values.api.livenessProbe.httpGet.path }}
+            port: {{ .Values.api.livenessProbe.httpGet.port }}
           initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
           failureThreshold: {{ .Values.api.livenessProbe.failureThreshold }}
         readinessProbe:
           httpGet:
-            path: /api/status
-            port: 8000
+            path: {{ .Values.api.readinessProbe.httpGet.path }}
+            port: {{ .Values.api.readinessProbe.httpGet.port }}
           initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
