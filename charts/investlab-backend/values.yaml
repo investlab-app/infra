@@ -68,7 +68,7 @@ api:
       service: "investlab-backend"
       env: "production"
       version: "0.1.0"
-      agentHost: "datadog-agent.datadog.svc.cluster.local"
+      agentHost: "datadog.datadog.svc.cluster.local"
       traceAgentPort: "8126"
       logsInjection: "true"
       instrumentMiddleware: "true"
