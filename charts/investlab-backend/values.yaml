@@ -81,7 +81,7 @@ api:
       instrumentDatabases: "true"
       instrumentCaches: "true"
       traceSampleRate: "1.0"
-      profilingEnabled: "false"
+      profilingEnabled: "true"
 
   # Persistent storage
   persistence:
