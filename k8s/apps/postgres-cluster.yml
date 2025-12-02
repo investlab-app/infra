@@ -1,0 +1,41 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cluster
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+
+  storage:
+    size: 10Gi
+    storageClass: oci-bv
+
+  bootstrap:
+    initdb:
+      database: investlab
+      secret:
+        name: postgres-superuser
+
+  superuserSecret:
+    name: postgres-superuser
+
+  enableSuperuserAccess: true
+
+  monitoring:
+    enablePodMonitor: false
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1"
+
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "256MB"

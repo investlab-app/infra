@@ -1,0 +1,46 @@
+{{- if and .Values.mcp.enabled .Values.mcp.echarts.enabled -}}
+# MCP ECharts Service - Chart generation and visualization
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-mcp.echarts.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mcp.echarts.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-mcp.echarts.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-mcp.echarts.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: echarts
+        image: {{ .Values.mcp.echarts.image.registry }}/{{ .Values.mcp.echarts.image.repository }}:{{ .Values.mcp.echarts.image.tag | default "22-alpine" }}
+        imagePullPolicy: Always
+        command: 
+          {{- toYaml .Values.mcp.echarts.command | nindent 10 }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-mcp.echarts.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.mcp.echarts.resources | nindent 10 }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "investlab-mcp.echarts.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}

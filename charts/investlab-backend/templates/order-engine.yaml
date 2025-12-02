@@ -1,0 +1,82 @@
+{{- if .Values.orderEngine.enabled -}}
+# Order Engine Service - Paper trading order processing
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "investlab-backend.order-engine.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.order-engine.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.orderEngine.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "investlab-backend.order-engine.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-backend.order-engine.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:17-alpine
+        command: ['sh', '-c', 'until pg_isready -h {{ include "postgres-cluster.fullname" . }}-rw.{{ include "postgres-cluster.namespace" . }}.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for postgres..."; sleep 5; done']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      {{- if .Values.redis.enabled }}
+      - name: wait-for-redis
+        image: redis:8.2-alpine
+        command: ['sh', '-c', 'until redis-cli -h {{ include "redis-cluster.fullname" . }}-master.{{ include "redis-cluster.namespace" . }}.svc.cluster.local -p 6379 ping; do echo "Waiting for redis..."; sleep 5; done']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      {{- end }}
+      containers:
+      - name: order-engine
+        image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        workingDir: {{ .Values.orderEngine.workingDir | default "/app" }}
+        command: {{ toYaml .Values.orderEngine.command | nindent 8 }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-backend.api.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
+        resources:
+          {{- toYaml .Values.orderEngine.resources | nindent 10 }}
+        livenessProbe:
+          exec:
+            command: ["pgrep", "-f", "run_order_engine"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command: ["pgrep", "-f", "run_order_engine"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: backend-code
+        emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "investlab-backend.order-engine.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}

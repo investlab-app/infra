@@ -1,0 +1,256 @@
+# Application ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "investlab-backend.api.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+data:
+  DEBUG: {{ .Values.api.config.debug | default "false" | quote }}
+  DJANGO_LOG_LEVEL: {{ .Values.api.config.djangoLogLevel | quote }}
+  ALLOWED_HOSTS: {{ .Values.api.config.allowedHosts | quote }}
+  CORS_ALLOWED_ORIGINS: {{ .Values.api.config.corsAllowedOrigins | quote }}
+  CSRF_TRUSTED_ORIGINS: {{ .Values.api.config.csrfTrustedOrigins | default .Values.api.config.corsAllowedOrigins | quote }}
+  POSTGRES_DB: {{ .Values.api.config.postgresDb | default "investlab" | quote }}
+  POSTGRES_HOST: {{ .Values.api.config.postgresHost | default "postgres-cluster-rw.postgres.svc.cluster.local" | quote }}
+  POSTGRES_PORT: {{ .Values.api.config.postgresPort | default "5432" | quote }}
+  REDIS_HOST: {{ .Values.api.config.redisHost | default "redis-cluster-master.redis.svc.cluster.local" | quote }}
+  REDIS_PORT: {{ .Values.api.config.redisPort | default "6379" | quote }}
+  OPENAI_API_URL: {{ .Values.api.config.openaiApiUrl | default "https://api.groq.com/openai/v1" | quote }}
+  OPENAI_TRANSLATING_MODEL: {{ .Values.api.config.openaiTranslatingModel | default "llama-3.1-8b-instant" | quote }}
+  TRANSLATE_INSTRUMENT_DESCRIPTION: {{ .Values.api.config.translateInstrumentDescription | default "false" | quote }}
+  EMAIL_BACKEND: {{ .Values.api.config.emailBackend | default "django.core.mail.backends.console.EmailBackend" | quote }}
+  EMAIL_HOST: {{ .Values.api.config.emailHost | quote }}
+  EMAIL_PORT: {{ .Values.api.config.emailPort | quote }}
+  EMAIL_USE_TLS: {{ .Values.api.config.emailUseTls | quote }}
+  EMAIL_HOST_USER: {{ .Values.api.config.emailHostUser | quote }}
+  MCP_MASSIVE_URL: {{ .Values.api.config.mcpMassiveUrl | default (printf "http://%s-mcp-massive.%s.svc.cluster.local:8050/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
+  MCP_ECHARTS_URL: {{ .Values.api.config.mcpEchartsUrl | default (printf "http://%s-mcp-echarts.%s.svc.cluster.local:8051/mcp" (include "investlab-backend.api.fullname" .) .Release.Namespace) | quote }}
+  USE_MINIO: {{ .Values.api.config.useMinio | quote }}
+  MINIO_ENDPOINT: {{ .Values.api.config.minioEndpoint | quote }}
+  MINIO_PORT: {{ .Values.api.config.minioPort | quote }}
+  MINIO_USE_SSL: {{ .Values.api.config.minioUseSsl | quote }}
+  MINIO_MEDIA_BUCKET_NAME: {{ .Values.api.config.minioMediaBucketName | quote }}
+  MINIO_STATIC_BUCKET_NAME: {{ .Values.api.config.minioStaticBucketName | quote }}
+  MINIO_REGION_NAME: {{ .Values.api.config.minioRegionName | quote }}
+  MINIO_PUBLIC_DOMAIN: {{ .Values.api.config.minioPublicDomain | quote }}
+  DD_TRACE_ENABLED: {{ .Values.api.config.datadog.traceEnabled | default "false" | quote }}
+  DD_SERVICE: {{ .Values.api.config.datadog.service | default "investlab-backend" | quote }}
+  DD_ENV: {{ .Values.api.config.datadog.env | default "production" | quote }}
+  DD_VERSION: {{ .Values.api.config.datadog.version | default "0.1.0" | quote }}
+  DD_AGENT_HOST: {{ .Values.api.config.datadog.agentHost | default "datadog-agent.datadog.svc.cluster.local" | quote }}
+  DD_TRACE_AGENT_PORT: {{ .Values.api.config.datadog.traceAgentPort | default "8126" | quote }}
+  DD_LOGS_INJECTION: {{ .Values.api.config.datadog.logsInjection | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_MIDDLEWARE: {{ .Values.api.config.datadog.instrumentMiddleware | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_DATABASES: {{ .Values.api.config.datadog.instrumentDatabases | default "true" | quote }}
+  DD_DJANGO_INSTRUMENT_CACHES: {{ .Values.api.config.datadog.instrumentCaches | default "true" | quote }}
+  DD_TRACE_SAMPLE_RATE: {{ .Values.api.config.datadog.traceSampleRate | default "1.0" | quote }}
+  DD_PROFILING_ENABLED: {{ .Values.api.config.datadog.profilingEnabled | default "false" | quote }}
+
+---
+# External Secrets Secret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: {{ include "investlab-backend-secrets.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: oci-vault
+    kind: ClusterSecretStore
+  target:
+    name: {{ include "investlab-backend-secrets.fullname" . }}
+    creationPolicy: Owner
+  data:
+    - secretKey: SECRET_KEY
+      remoteRef:
+        key: django-secret-key
+    - secretKey: POSTGRES_USER
+      remoteRef:
+        key: postgres-username
+    - secretKey: POSTGRES_PASSWORD
+      remoteRef:
+        key: postgres-password
+    - secretKey: CLERK_SECRET_KEY
+      remoteRef:
+        key: clerk-secret-key
+    - secretKey: CLERK_ISSUER
+      remoteRef:
+        key: clerk-issuer
+    - secretKey: CLERK_JWT_KEY
+      remoteRef:
+        key: clerk-jwt-key
+    - secretKey: POLYGON_SECRET_KEY
+      remoteRef:
+        key: polygon-secret-key
+    - secretKey: ALPACA_PUBLIC_KEY
+      remoteRef:
+        key: alpaca-public-key
+    - secretKey: ALPACA_SECRET_KEY
+      remoteRef:
+        key: alpaca-secret-key
+    - secretKey: MINIO_ACCESS_KEY
+      remoteRef:
+        key: minio-access-key
+    - secretKey: MINIO_SECRET_KEY
+      remoteRef:
+        key: minio-secret-key
+    - secretKey: OPENAI_API_KEY
+      remoteRef:
+        key: openai-api-key
+    - secretKey: GEMINI_API_KEY
+      remoteRef:
+        key: gemini-api-key
+    - secretKey: VAPID_PRIVATE_KEY
+      remoteRef:
+        key: vapid-private-key
+    - secretKey: VAPID_PUBLIC_KEY
+      remoteRef:
+        key: vapid-public-key
+    - secretKey: ADMIN_EMAIL
+      remoteRef:
+        key: admin-email
+    - secretKey: FROM_EMAIL
+      remoteRef:
+        key: from-email
+    - secretKey: REDIS_PASSWORD
+      remoteRef:
+        key: redis-password
+    - secretKey: EMAIL_HOST_PASSWORD
+      remoteRef:
+        key: email-host-password
+        
+---
+        
+# Web Secrets
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: {{ include "investlab-backend.web.fullname" . }}-secrets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.web.labels" . | nindent 4 }}
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: oci-vault
+    kind: ClusterSecretStore
+  target:
+    name: {{ include "investlab-backend.web.fullname" . }}-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: VITE_PUBLIC_POSTHOG_KEY
+      remoteRef:
+        key: vite-public-posthog-key
+    - secretKey: VITE_PUBLIC_POSTHOG_HOST
+      remoteRef:
+        key: vite-public-posthog-host
+    - secretKey: VITE_CLERK_PUBLISHABLE_KEY
+      remoteRef:
+        key: clerk-publishable-key
+
+---
+# Static files PVC
+{{- if .Values.api.persistence.static.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "investlab-backend-pvc.fullname" . }}-static
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.api.persistence.static.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.api.persistence.static.size }}
+{{- end }}
+
+---
+# Media files PVC
+{{- if .Values.api.persistence.media.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "investlab-backend-pvc.fullname" . }}-media
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.api.persistence.media.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.api.persistence.media.size }}
+{{- end }}
+
+---
+# Service Monitor
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "investlab-backend.api.fullname" . }}-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.serviceMonitor.labels }}{{- toYaml . | nindent 4 }}{{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "investlab-backend.api.selectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchLabels:
+      name: {{ .Values.monitoring.serviceMonitor.namespace }}
+  endpoints:
+  - port: http
+    targetPort: 8000
+    path: /metrics
+{{- end }}
+
+{{- if .Values.mcp.enabled }}
+{{- if .Values.mcp.massive.enabled }}
+# MCP Massive ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "investlab-mcp.massive.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.massive.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.mcp.massive.logLevel | default "INFO" | quote }}
+  PORT: {{ .Values.mcp.massive.port | default "8000" | quote }}
+  MCP_TRANSPORT: {{ .Values.mcp.massive.transport | default "streamable-http" | quote }}
+  MASSIVE_MCP_HOST: {{ .Values.mcp.massive.host | default "0.0.0.0" | quote }}
+{{- end }}
+
+---
+{{- if .Values.mcp.echarts.enabled }}
+# MCP ECharts ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "investlab-mcp.echarts.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "investlab-mcp.echarts.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.mcp.echarts.logLevel | default "INFO" | quote }}
+  PORT: {{ .Values.mcp.echarts.port | default "8000" | quote }}
+  NODE_ENV: {{ .Values.mcp.echarts.nodeEnv | default "production" | quote }}
+  {{- if .Values.mcp.echarts.minio }}
+  MINIO_ENDPOINT: {{ .Values.mcp.echarts.minio.endpoint | quote }}
+  MINIO_PORT: {{ .Values.mcp.echarts.minio.port | default 9000 | quote }}
+  MINIO_USE_SSL: {{ .Values.mcp.echarts.minio.useSsl | default true | quote }}
+  MINIO_BUCKET_NAME: {{ .Values.mcp.echarts.minio.bucketName | default "echarts" | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}

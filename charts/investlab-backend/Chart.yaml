@@ -1,0 +1,13 @@
+apiVersion: v2
+name: investlab-backend
+description: InvestLab Backend
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+home: https://github.com/investlab-app/backend
+sources:
+  - https://github.com/investlab-app/backend
+maintainers:
+  - name: InvestLab Team
+    email: app.investlab@gmail.com
+kubeVersion: ">=1.25.0-0"

@@ -1,0 +1,338 @@
+# Global configuration
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets:
+    - name: ghcr-secret
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    existingSecret: redis-auth
+  master:
+    persistence:
+      enabled: true
+      size: 32Gi
+      storageClass: oci-bv
+    replica:
+      replicaCount: 2
+      persistence:
+        enabled: true
+        size: 32Gi
+        storageClass: oci-bv
+
+# Main Django API configuration
+api:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: investlab-app/backend
+    tag: latest
+    pullPolicy: Always
+
+  # Resource configuration
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+  # Application configuration
+  config:
+    djangoLogLevel: INFO
+    allowedHosts: "*"
+    corsAllowedOrigins: https://api.investlab.kapica.click
+    # CSRF trusted origins (defaults to corsAllowedOrigins if not set)
+    # For admin panel access, include both api and main domains
+    csrfTrustedOrigins: "https://api.investlab.kapica.click,https://investlab.kapica.click"
+    # MCP Service URLs (optional - defaults to internal k8s services)
+    # mcpMassiveUrl: "http://custom-mcp-massive:8000/mcp"
+    # mcpEchartsUrl: "http://custom-mcp-echarts:8000/mcp"
+
+    emailBackend: "django.core.mail.backends.smtp.EmailBackend"
+    emailHost: "smtp.gmail.com"
+    emailPort: "587"
+    emailUseTls: "true"
+    emailHostUser: "app.investlab@gmail.com"
+
+    # S3 / MinIO Configuration
+    useMinio: "true"
+    minioEndpoint: "minio.minio.svc.cluster.local"
+    minioPort: "9000"
+    minioUseSsl: "true"
+    minioMediaBucketName: "investlab-media"
+    minioStaticBucketName: "investlab-static"
+    minioRegionName: "us-east-1"
+    minioPublicDomain: "minio.investlab.kapica.click"
+
+    # Datadog APM Configuration
+    datadog:
+      traceEnabled: "true"
+      service: "investlab-backend"
+      env: "production"
+      version: "0.1.0"
+      agentHost: "datadog.datadog.svc.cluster.local"
+      traceAgentPort: "8126"
+      logsInjection: "true"
+      instrumentMiddleware: "true"
+      instrumentDatabases: "true"
+      instrumentCaches: "true"
+      traceSampleRate: "1.0"
+      profilingEnabled: "false"
+
+  # Persistent storage
+  persistence:
+    static:
+      enabled: false # Using emptyDir + collectstatic init container
+      size: 5Gi
+      storageClass: oci-bv
+    media:
+      enabled: false # Using MinIO for media storage
+      size: 10Gi
+      storageClass: oci-bv
+
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /api/status/
+      port: 8000
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /api/status/
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Web Frontend configuration
+web:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: investlab-app/web
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Celery Worker configuration
+worker:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "celery", "-A", "config", "worker", "-l", "info"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 2Gi
+      cpu: 500m
+
+# Celery Beat Scheduler configuration
+scheduler:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "celery", "-A", "config", "beat", "-l", "info"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 50m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+
+# Price Stream Service configuration
+priceStream:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "stream_prices"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+# Price Notifier Service configuration
+priceNotifier:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "notify_prices"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 50m
+    limits:
+      memory: 512Mi
+      cpu: 400m
+
+# Order Engine Service configuration
+orderEngine:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "run_order_engine"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 100m
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+# MCP Services configuration
+mcp:
+  enabled: true
+
+  massive:
+    enabled: true
+    replicaCount: 1
+    image:
+      registry: ghcr.io
+      repository: astral-sh/uv
+      tag: debian
+    command:
+      - uvx
+      - --from
+      - git+https://github.com/investlab-app/mcp_massive
+      - mcp_massive
+    # Environment configuration
+    logLevel: INFO
+    port: "8000"
+    transport: streamable-http # Added
+    host: "0.0.0.0" # Added
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+  echarts:
+    enabled: true
+    replicaCount: 1
+    image:
+      registry: mirror.gcr.io/library
+      repository: node
+      tag: 22-slim
+    command: ["/bin/sh", "-c", "npx -y mcp-echarts -t streamable --port 8000"]
+    ports:
+      - port: 8051
+    # Configuration values
+    logLevel: INFO
+    port: "8000"
+    nodeEnv: production
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 200m
+      limits:
+        memory: 512Mi
+        cpu: 400m
+    minio:
+      endpoint: "minio.investlab.kapica.click"
+      port: 443
+      useSsl: true
+      bucketName: "investlab-echarts-mcp"
+
+# Service configuration
+service:
+  type: ClusterIP
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://api.investlab.kapica.click
+    nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+    nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization
+  tls:
+    - hosts:
+        - api.investlab.kapica.click
+        - investlab.kapica.click
+      secretName: investlab-backend-tls
+  hosts:
+    - host: api.investlab.kapica.click
+      paths:
+        - path: /api
+          service: api
+          port: 8000
+        - path: /static
+          service: api
+          port: 8000
+        - path: /media
+          service: api
+          port: 8000
+    - host: investlab.kapica.click
+      paths:
+        - path: /api
+          service: api
+          port: 8000
+        - path: /static
+          service: api
+          port: 8000
+        - path: /media
+          service: api
+          port: 8000
+        - path: /ws
+          service: api
+          port: 8000
+        - path: /
+          service: web
+          port: 80
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      release: prometheus
