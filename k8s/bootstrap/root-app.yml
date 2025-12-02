@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/investlab-app/infra.git
-    targetRevision: rewrite
+    targetRevision: main
     path: k8s
     directory:
       recurse: true

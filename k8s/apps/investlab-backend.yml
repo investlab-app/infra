@@ -13,7 +13,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/investlab-app/infra.git
-    targetRevision: rewrite
+    targetRevision: main
     path: charts/investlab-backend
     helm:
       valueFiles:
