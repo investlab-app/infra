@@ -301,6 +301,7 @@ ingress:
     - hosts:
         - api.investlab.kapica.click
         - investlab.kapica.click
+        - www.investlab.kapica.click
       secretName: investlab-backend-tls
   hosts:
     - host: api.investlab.kapica.click
@@ -315,6 +316,23 @@ ingress:
           service: api
           port: 8000
     - host: investlab.kapica.click
+      paths:
+        - path: /api
+          service: api
+          port: 8000
+        - path: /static
+          service: api
+          port: 8000
+        - path: /media
+          service: api
+          port: 8000
+        - path: /ws
+          service: api
+          port: 8000
+        - path: /
+          service: web
+          port: 80
+    - host: www.investlab.kapica.click
       paths:
         - path: /api
           service: api
