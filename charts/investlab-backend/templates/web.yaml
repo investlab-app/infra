@@ -43,6 +43,8 @@ spec:
           timeoutSeconds: {{ .Values.web.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ .Values.web.readinessProbe.failureThreshold }}
         envFrom:
+          - configMapRef:
+              name: {{ include "investlab-backend.web.fullname" . }}-config
           - secretRef:
               name: {{ include "investlab-backend.web.fullname" . }}-secrets
       affinity:

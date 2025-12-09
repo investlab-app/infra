@@ -125,6 +125,8 @@ web:
     repository: investlab-app/web
     tag: latest
     pullPolicy: Always
+  config:
+    landingImgsBaseUrl: "http://minio.investlab.kapica.click/"
   resources:
     requests:
       memory: 128Mi
