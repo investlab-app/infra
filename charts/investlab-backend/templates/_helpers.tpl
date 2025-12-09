@@ -29,6 +29,10 @@ investlab-backend-{{ .Release.Name }}
 {{ include "investlab-backend.api.fullname" . }}-order-engine
 {{- end }}
 
+{{- define "investlab-backend.graph-lang-scheduler.fullname" -}}
+{{ include "investlab-backend.api.fullname" . }}-graph-lang-scheduler
+{{- end }}
+
 {{- define "investlab-mcp.massive.fullname" -}}
 {{ include "investlab-backend.api.fullname" . }}-mcp-massive
 {{- end }}
@@ -80,6 +84,12 @@ app.kubernetes.io/component: order-engine
 app.kubernetes.io/part-of: investlab
 {{- end }}
 
+{{- define "investlab-backend.graph-lang-scheduler.labels" -}}
+app.kubernetes.io/name: investlab-backend
+app.kubernetes.io/component: graph-lang-scheduler
+app.kubernetes.io/part-of: investlab
+{{- end }}
+
 {{- define "investlab-mcp.massive.labels" -}}
 app.kubernetes.io/name: investlab-mcp
 app.kubernetes.io/component: massive
@@ -128,6 +138,12 @@ app.kubernetes.io/part-of: investlab
 {{- define "investlab-backend.order-engine.selectorLabels" -}}
 app.kubernetes.io/name: investlab-backend
 app.kubernetes.io/component: order-engine
+app.kubernetes.io/part-of: investlab
+{{- end }}
+
+{{- define "investlab-backend.graph-lang-scheduler.selectorLabels" -}}
+app.kubernetes.io/name: investlab-backend
+app.kubernetes.io/component: graph-lang-scheduler
 app.kubernetes.io/part-of: investlab
 {{- end }}
 

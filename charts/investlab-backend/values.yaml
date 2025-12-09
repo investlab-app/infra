@@ -224,6 +224,21 @@ orderEngine:
       memory: 2Gi
       cpu: 1
 
+# Graph Lang Scheduler Service configuration
+graphLangScheduler:
+  enabled: true
+  replicaCount: 1
+  command: ["uv", "run", "manage.py", "run_scheduler"]
+  workingDir: /app
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 50m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+
 # MCP Services configuration
 mcp:
   enabled: true
