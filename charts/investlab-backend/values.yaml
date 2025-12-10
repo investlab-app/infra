@@ -191,10 +191,10 @@ priceStream:
   resources:
     requests:
       memory: 512Mi
-      cpu: 100m
+      cpu: 500m
     limits:
       memory: 1Gi
-      cpu: 500m
+      cpu: 1000m
 
 # Price Notifier Service configuration
 priceNotifier:
