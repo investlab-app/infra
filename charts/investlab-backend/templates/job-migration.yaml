@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "investlab-backend.fullname" . }}-migration
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        {{- include "investlab-backend.api.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: wait-for-db
+        image: postgres:17-alpine
+        command: ['sh', '-c', 'until pg_isready -h {{ include "postgres-cluster.fullname" . }}-rw.{{ include "postgres-cluster.namespace" . }}.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for postgres..."; sleep 5; done']
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      containers:
+      - name: migration
+        image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            echo "Starting migration job..."
+            
+            echo "Running database migrations..."
+            uv run manage.py migrate --noinput
+            
+            echo "Collecting static files..."
+            uv run manage.py collectstatic --noinput
+            
+            echo "Migration job completed successfully."
+        envFrom:
+        - configMapRef:
+            name: {{ include "investlab-backend.api.fullname" . }}-config
+        - secretRef:
+            name: {{ include "investlab-backend-secrets.fullname" . }}
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"

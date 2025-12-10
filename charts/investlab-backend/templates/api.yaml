@@ -5,6 +5,8 @@ kind: Deployment
 metadata:
   name: {{ include "investlab-backend.api.fullname" . }}
   namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
   labels:
     {{- include "investlab-backend.api.labels" . | nindent 4 }}
 spec:
@@ -17,66 +19,6 @@ spec:
       labels:
         {{- include "investlab-backend.api.labels" . | nindent 8 }}
     spec:
-      initContainers:
-      - name: wait-for-db
-        image: postgres:17-alpine
-        command: ['sh', '-c', 'until pg_isready -h {{ include "postgres-cluster.fullname" . }}-rw.{{ include "postgres-cluster.namespace" . }}.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for postgres..."; sleep 5; done']
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "100m"
-      {{- if .Values.redis.enabled }}
-      - name: wait-for-redis
-        image: redis:8.2-alpine
-        command: ['sh', '-c', 'until redis-cli -h {{ include "redis-cluster.fullname" . }}-master.{{ include "redis-cluster.namespace" . }}.svc.cluster.local -p 6379 ping; do echo "Waiting for redis..."; sleep 5; done']
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "100m"
-      {{- end }}
-      - name: migrate
-        image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
-        command: ['sh', '-c', 'uv run manage.py migrate --noinput']
-        envFrom:
-        - configMapRef:
-            name: {{ include "investlab-backend.api.fullname" . }}-config
-        - secretRef:
-            name: {{ include "investlab-backend-secrets.fullname" . }}
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "250m"
-      - name: collectstatic
-        image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.api.image.pullPolicy }}
-        command: ['sh', '-c', 'uv run manage.py collectstatic --noinput']
-        envFrom:
-        - configMapRef:
-            name: {{ include "investlab-backend.api.fullname" . }}-config
-        - secretRef:
-            name: {{ include "investlab-backend-secrets.fullname" . }}
-        {{- if ne .Values.api.config.useMinio "true" }}
-        volumeMounts:
-        - name: static-files
-          mountPath: /app/static
-        {{- end }}
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "250m"
       containers:
       - name: api
         image: "{{ .Values.global.imageRegistry }}/{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
