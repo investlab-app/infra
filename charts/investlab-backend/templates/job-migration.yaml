@@ -6,13 +6,17 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
   labels:
-    {{- include "investlab-backend.api.labels" . | nindent 4 }}
+    app.kubernetes.io/name: investlab-backend
+    app.kubernetes.io/component: migration
+    app.kubernetes.io/part-of: investlab
 spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
       labels:
-        {{- include "investlab-backend.api.labels" . | nindent 8 }}
+        app.kubernetes.io/name: investlab-backend
+        app.kubernetes.io/component: migration
+        app.kubernetes.io/part-of: investlab
     spec:
       restartPolicy: Never
       initContainers:
