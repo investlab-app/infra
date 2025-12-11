@@ -29,7 +29,7 @@ api:
   autoscaling:
     enabled: true
     minReplicas: 2
-    maxReplicas: 5
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 80
   image:
     repository: investlab-app/backend
@@ -40,7 +40,7 @@ api:
   resources:
     requests:
       memory: 1Gi
-      cpu: "250m"
+      cpu: "400m"
     limits:
       memory: 3Gi
       cpu: "750m"
